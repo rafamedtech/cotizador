@@ -1,42 +1,37 @@
-<script setup>
-defineProps(['invoice']);
+<script lang="ts" setup>
+import type { InvoiceOutline } from '@/types/invoice';
+
+defineProps<{
+  invoice: InvoiceOutline;
+}>();
 </script>
 
 <template>
   <NuxtLink
-    :to="{ path: `/cotizacion/${invoice.id}` }"
-    class="relative flex w-full items-center justify-between rounded-2xl bg-white py-7 px-4 transition-all duration-300 hover:shadow-lg focus:outline-primary dark:bg-dark-strong dark:text-light-medium lg:px-8"
+    :to="{ path: `/cotizacion/${invoice.invId}` }"
+    class="relative flex h-24 w-full items-center justify-between gap-0 rounded-2xl bg-white py-7 px-4 text-dark-medium transition-all duration-300 hover:shadow-lg focus:outline-primary dark:bg-dark-strong dark:text-light-medium lg:overflow-y-hidden lg:px-8"
   >
-    <span class="text-[8px] lg:text-xs">#{{ invoice.id }}</span>
-    <span class="due-date hidden w-1/5 lg:block">{{ invoice.paymentDueDate }}</span>
-    <span class="person w-1/5 text-xs lg:text-base">{{ invoice.clientCompany }}</span>
-    <span class="w-1/5">{{
-      new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-      }).format(invoice.invoiceTotal)
-    }}</span>
+    <p class="w-[5%] text-xs lg:w-[10%]">#{{ invoice.invId }}</p>
+    <p class="w-[20%] text-xs lg:text-base">{{ invoice.invoiceDate }}</p>
+    <p class="w-[30%] overflow-x-hidden text-xs lg:w-[25%] lg:text-base">
+      {{ invoice.clientCompany }}
+    </p>
+    <Transition name="slide-up" appear>
+      <div
+        class="absolute right-0 -bottom-6 lg:static lg:w-[25%]"
+        :style="{ transitionDelay: '300ms' }"
+      >
+        <StatusButton :status="invoice.status" />
+      </div>
+    </Transition>
 
-    <div
-      class="status-button absolute inset-0 flex w-1/5 gap-2 rounded-[20px] py-2 px-4 lg:static lg:rounded-[10px] lg:px-8"
-      :class="{
-        paid: invoice.invoicePaid,
-        draft: invoice.invoiceDraft,
-        pending: invoice.invoicePending,
-      }"
-    >
-      <span class="hidden items-center gap-2 lg:flex" v-if="invoice.invoicePaid">
-        <Icon name="icon-park-outline:check-one" class="text-base text-green-500" />
-        Vendido
-      </span>
-      <span
-        class="hidden items-center gap-2 text-gray-500 dark:text-dark-medium lg:flex"
-        v-if="invoice.invoiceDraft"
-        ><Icon name="ri:draft-line" class="text-base" />Borrador</span
-      >
-      <span class="hidden items-center gap-2 lg:flex" v-if="invoice.invoicePending">
-        <Icon name="icon-park-outline:caution" class="text-base text-secondary" />Pendiente</span
-      >
-    </div>
+    <p class="w-[20%] text-xs font-bold lg:text-base">
+      {{
+        new Intl.NumberFormat('es-MX', {
+          style: 'currency',
+          currency: 'MXN',
+        }).format(invoice.invoiceTotal)
+      }}
+    </p>
   </NuxtLink>
 </template>

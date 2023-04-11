@@ -1,13 +1,12 @@
 <script setup>
-import { useStore } from '@/stores/main';
 import logo from '@/assets/images/Suntech-logo-cropped.png';
 
+const store = useStore();
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
 
-// const { userLogout } = useStore();
 const userLogout = () => {
-  useStore().$patch({
+  store.$patch({
     customModal: true,
     modalType: 'logout',
   });
@@ -16,7 +15,7 @@ const userLogout = () => {
 
 <template>
   <header
-    class="z-[99] flex w-full justify-between bg-dark-medium shadow-sm dark:bg-dark-strong md:fixed md:max-h-screen md:min-h-full md:min-w-[80px] md:flex-col lg:w-32 lg:shadow-lg"
+    class="z-[99] flex w-full justify-between bg-dark-medium shadow-sm dark:bg-dark-strong print:hidden md:fixed md:max-h-screen md:min-h-full md:min-w-[80px] md:flex-col lg:w-32 lg:shadow-lg"
   >
     <div class="flex h-16 w-fit items-center justify-center rounded-[10px] p-4 pt-6 lg:w-full">
       <img :src="logo" alt="" class="h-full w-auto" />

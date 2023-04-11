@@ -59,6 +59,8 @@ const filterContacts = () => {
   });
 };
 
+console.log(currentInvoice);
+
 onMounted(() => {
   filterContacts();
 });
@@ -125,12 +127,12 @@ const onUpload = async (e) => {
 };
 
 //// Close modal when click outside
-const invoiceWrap = ref(null);
-const checkClick = (e) => {
-  if (e.target === invoiceWrap.value) {
-    toggleModal();
-  }
-};
+// const invoiceWrap = ref(null);
+// const checkClick = (e) => {
+//   if (e.target === invoiceWrap.value) {
+//     toggleModal();
+//   }
+// };
 
 const deleteInvoiceItem = (id) => {
   state.invoiceItemList = state.invoiceItemList.filter((item) => item.id !== id);
@@ -258,7 +260,7 @@ const updateInvoice = async () => {
     updateCurrentInvoice(currentInvoice.value.id);
   }, 1000);
 
-  getInvoices();
+  await getInvoices();
 };
 
 const submitForm = () => {
@@ -315,15 +317,15 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div
-    @click="checkClick"
-    ref="invoiceWrap"
-    class="invoice-wrap z-50 flex w-[300vw] flex-col bg-[#1a1a1a]/50 lg:w-[200vw]"
-  >
+  <div ref="invoiceWrap" class="modal z-50 flex w-[300vw] flex-col bg-[#1a1a1a]/50 lg:w-[200vw]">
+    <!-- < class="modal"> -->
+    <!-- @click="checkClick" -->
+
     <Transition name="invoice">
+      <!-- <div class="modal-box relative"> -->
       <form
         @submit.prevent="submitForm"
-        class="invoice-content bg-light relative w-screen bg-light-medium px-4 pt-40 pb-14 dark:bg-dark-strong lg:max-w-3xl lg:p-14"
+        class="bg-light relative w-screen bg-light-medium px-4 pt-40 pb-14 dark:bg-dark-strong lg:max-w-3xl lg:p-14"
       >
         <!-- <LoadingSpinner v-show="state.loading" /> -->
         <h1

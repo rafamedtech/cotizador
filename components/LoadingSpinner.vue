@@ -11,8 +11,9 @@
   z-index: 101;
   height: 100%;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  position: absolute;
+  // padding-top: 4rem;
+  // background-color: rgba(0, 0, 0, 0.5);
+  // position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,14 +24,14 @@
   }
   span {
     display: block;
-    width: 60px;
-    height: 60px;
+    // width: 60px;
+    // height: 60px;
     margin: 0 auto;
     border: 3px solid transparent;
-    border-top-color: #fff;
-    border-bottom-color: #fff;
+
     border-radius: 50%;
     animation: spin ease 1000ms infinite;
+    @apply h-6 w-6 border-t-dark-medium border-b-dark-medium dark:border-t-light-medium dark:border-b-light-medium;
   }
 }
 </style>

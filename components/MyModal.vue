@@ -1,10 +1,12 @@
 <script setup>
 // Dependencies imports
-import { useStore } from '@/stores/main';
-import { storeToRefs } from 'pinia';
+// import { useStore } from '@/stores/main';
+// import { storeToRefs } from 'pinia';
 
-const { editInvoice } = storeToRefs(useStore());
+const { editInvoice, invoiceDialog, modalActive } = storeToRefs(useStore());
 const { editCurrentInvoice, toggleModal, toggleInvoice } = useStore();
+
+const closeBtn = ref(null);
 
 const closeModal = () => {
   toggleModal();
@@ -17,6 +19,16 @@ const closeInvoice = () => {
     editCurrentInvoice();
   }
 };
+
+async function closeInvoiceModal() {
+  // invoiceDialog.value = false;
+  modalActive.value = false;
+  await navigateTo('/');
+  // toggleModal();
+  // closeBtn.value.click();
+  // const html = document.querySelector('html');
+  // html.style.overflowY = 'scroll';
+}
 </script>
 
 <template>
@@ -31,11 +43,19 @@ const closeInvoice = () => {
           Regresar
         </button>
         <button
-          @click="closeInvoice"
           class="btn border-none bg-primary text-white hover:bg-primary/50 focus:outline-primary dark:bg-primary/50 dark:hover:bg-primary dark:hover:text-light-medium"
+          @click="closeInvoiceModal"
         >
           Salir
         </button>
+        <label ref="closeBtn" for="my-modal-3" class="hidden">✕</label>
+
+        <!-- <label
+            for="my-modal-3"
+            class="btn border-none bg-primary text-light-medium hover:bg-primary/50 focus:outline-primary"
+          >
+            Salir
+          </label> -->
       </div>
     </div>
   </div>
@@ -43,7 +63,7 @@ const closeInvoice = () => {
 
 <style lang="scss" scoped>
 .my-modal {
-  z-index: 100;
+  z-index: 10000;
   position: fixed;
   justify-content: center;
   align-items: center;

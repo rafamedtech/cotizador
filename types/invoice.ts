@@ -1,43 +1,13 @@
-interface InvoiceItem {
-  id: string;
-  itemName: string;
-  qty: string;
-  partNo: string;
-  price: string;
-  total: string;
-}
+import type { Invoice, InvoiceItem } from '@prisma/client';
 
-interface Features {
-  text: string;
-  image?: string;
-}
+export type InvoiceWithItems = Invoice & {
+  invoiceItem: InvoiceItem[];
+};
 
-export default interface Invoice {
-  id: number;
-  created_at: Date;
-  clientCompany: string;
-  clientName: string;
-  clientName2?: string;
-  clientEmail: string;
-  clientEmail2?: string;
-  currencyType: string;
-  exchangeCost: number;
-  eta: string;
-  invoiceDateUnix: number;
+export interface InvoiceOutline {
+  invId: string;
   invoiceDate: string;
-  paymentTerms: number;
-  paymentDueDateUnix: number;
-  paymentDueDate: string;
-  condition: string;
-  paymentType: string;
-  notes: string;
-  featureType?: string;
-  features?: Features;
-  invoiceItemList: InvoiceItem[];
-  invoiceTax: number;
-  invoiceSubtotal: number;
+  clientCompany: string;
   invoiceTotal: number;
-  invoicePending: boolean;
-  invoiceDraft: boolean;
-  invoicePaid: boolean;
+  status: string;
 }

@@ -1,31 +1,32 @@
 <script setup>
 // Dependencies imports
-import { useStore } from '@/stores/main';
-import { storeToRefs } from 'pinia';
+// import { useStore } from '@/stores/main';
+// import { storeToRefs } from 'pinia';
 
 // Definitions
-const { invoiceDialog, modalActive, customModal, invoicesLoaded, user } = storeToRefs(useStore());
-// const { getInvoices, fetchUser } = useStore();
+const { modalActive, customModal } = storeToRefs(useStore());
+const { getInvoices } = await useInvoices();
 
-// getInvoices();
+await getInvoices();
+
 // fetchUser();
 </script>
 
 <template>
-  <div>
+  <main>
     <NuxtLayout>
       <div
         class="relative flex flex-[1] flex-col overflow-x-auto bg-light-medium p-0 transition-all duration-300 dark:bg-[#222222]"
       >
         <MyModal v-if="modalActive" />
         <CustomModal v-if="customModal" />
-        <Transition name="invoice">
-          <InvoiceModal v-if="invoiceDialog" />
-        </Transition>
+
         <NuxtPage />
       </div>
     </NuxtLayout>
-  </div>
+
+    <!-- <NewInvoice /> -->
+  </main>
 </template>
 
 <style lang="scss">
@@ -40,19 +41,9 @@ const { invoiceDialog, modalActive, customModal, invoicesLoaded, user } = storeT
 
 // animated invoice
 
-.invoice-enter-active,
-.invoice-leave-active {
-  transition: 0.4s ease all;
-}
-
-.invoice-enter-from,
-.invoice-leave-to {
-  transform: translateX(-700px);
-}
-// .page-move,
 .page-enter-active,
 .page-leave-active {
-  transition: 0.4s ease-out all;
+  transition: 0.3s ease all;
 }
 
 .page-enter-from {
@@ -96,7 +87,6 @@ const { invoiceDialog, modalActive, customModal, invoicesLoaded, user } = storeT
     height: 10px;
     border-radius: 50%;
     display: none;
-    // margin-right: 8px;
   }
   @media (min-width: 900px) {
     display: initial;
@@ -105,18 +95,13 @@ const { invoiceDialog, modalActive, customModal, invoicesLoaded, user } = storeT
     justify-content: center;
   }
   font-size: 12px;
-  // margin-right: 30px;
   align-items: center;
-  // margin: 0 auto;
-  // text-align: center;
-  // padding: 8px 30px;
   border-radius: 10px;
 }
 
 .paid {
   &::before {
     background-color: #29b385;
-    // background-color: #33d69f;
   }
   color: #29b385;
   background-color: rgba(51, 214, 160, 0.1);
@@ -129,14 +114,19 @@ const { invoiceDialog, modalActive, customModal, invoicesLoaded, user } = storeT
   color: #ff8f00;
   background-color: rgba(255, 145, 0, 0.1);
 }
+.canceled {
+  &::before {
+    @apply bg-red-500;
+  }
+  @apply bg-red-500/10 text-red-500;
+}
 
 .draft {
   &::before {
     background-color: #747680;
-    // background-color: #dfe3fa;
   }
-  color: #747680;
-  // color: #dfe3fa;
+  // color: #747680;
+  @apply text-[#747680] dark:bg-[#747680]/50 dark:text-light-medium;
   background-color: rgba(223, 227, 250, 0.5);
 }
 </style>

@@ -1,23 +1,30 @@
 <script setup lang="ts">
 // Imports
-import { useStore } from '@/stores/main';
-import { storeToRefs } from 'pinia';
 
 // Definitions
-const { currentInvoice, modalType } = storeToRefs(useStore());
-const { deleteCurrentInvoice, userLogout } = useStore();
+const store = useStore();
+const authStore = useAuthStore();
+const { modalType } = storeToRefs(store);
+const { deleteCurrentInvoice, getInvoices } = store;
+const { userLogout } = authStore;
 
 const isLoading = ref(false);
 
 const closeModal = () => {
-  useStore().$patch({
+  store.$patch({
     customModal: false,
   });
 };
 
+const { id } = useRoute().params;
+
+const { currentInvoice } = await useInvoice(id && id.toString());
+const { deleteInvoiceOnDb } = await useInvoice(id && id.toString());
 const deleteInvoice = async () => {
-  deleteCurrentInvoice(currentInvoice.value?.id as number);
+  // deleteCurrentInvoice(currentInvoice.value?.id as number);
+  await deleteInvoiceOnDb(currentInvoice.value?.id as number);
   closeModal();
+  // await getInvoices();
   await navigateTo('/');
 };
 
@@ -46,11 +53,11 @@ const createPDF = () => {
           La cotización fue enviada exitosamente a los siguientes correos:
         </p>
         <div class="mx-auto w-full text-center">
-          <span class="italic text-primary">{{ currentInvoice?.clientEmail }}</span>
+          <!-- <span class="italic text-primary">{{ currentInvoice?.clientEmail }}</span>
           <br />
           <span v-if="currentInvoice?.clientEmail2" class="italic text-primary">{{
             currentInvoice?.clientEmail2
-          }}</span>
+          }}</span> -->
         </div>
         <div class="mx-auto mt-6 flex w-fit gap-2">
           <button

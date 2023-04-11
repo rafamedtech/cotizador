@@ -1,47 +1,88 @@
 import { defineStore } from 'pinia';
-import type Invoice from '@/types/invoice';
-
-interface Credentials {
-  email: string;
-  password: string;
-}
+// import type { InvoiceWithItems } from '@/types/invoice';
+import type Contact from '@/types/contact';
+import { InvoiceOutline, InvoiceWithItems } from '~~/types/invoice';
 
 export const useStore = defineStore('main', () => {
   const invoiceDialog = ref(false);
+  const closeBtn = ref(null);
   const modalActive = ref(false);
-  const invoiceData = ref<Invoice[]>([]);
   const invoicesLoaded = ref(false);
-  const currentInvoice = ref<Invoice | undefined>(undefined);
   const editInvoice = ref(false);
-  const contactData = ref<any>([]);
+  // const currentInvoice = ref<Invoice | undefined>(undefined);
+  // const invoiceData = ref<Invoice[]>([]);
+  const contactData = ref<Contact[]>([]);
   const customModal = ref(false);
   const modalType = ref('');
+  const notificationMsg = ref('');
+  const isLoading = ref(false);
 
-  // const errorMsg = ref("");
+  const filterResults = ref(true);
+  const filteredInvoices = reactive<InvoiceOutline[]>([]);
+
+  const searchQuery = ref('');
+  const filterQuery = ref('Todas');
 
   const supabase = useSupabaseClient();
-  const { auth } = useSupabaseAuthClient();
 
-  const user = useSupabaseUser();
-
-  const toggleInvoice = (): void => {
+  function toggleInvoice() {
     invoiceDialog.value = !invoiceDialog.value;
-  };
+  }
 
-  const toggleModal = (): void => {
+  function toggleModal() {
     modalActive.value = !modalActive.value;
-  };
+  }
 
-  const getInvoices = async () => {
+  // function setCurrentInvoice(payload: string) {
+  //   currentInvoice.value = invoiceData.value?.find((invoice: Invoice) => {
+  //     return invoice.invoiceId?.toString() === payload.toString();
+  //   });
+  // }
+
+  function editCurrentInvoice() {
+    editInvoice.value = !editInvoice.value;
+  }
+
+  function deleteInvoice(payload: string) {
+    invoiceData.value = invoiceData.value?.filter(
+      (invoice: InvoiceWithItems) => invoice.invId !== payload
+    );
+  }
+
+  async function updateCurrentInvoice(payload: number | string) {
+    deleteInvoice(payload as string);
+    await getInvoices();
+    // toggleInvoice();
+    editCurrentInvoice();
+    setCurrentInvoice(payload as string);
+  }
+
+  async function deleteCurrentInvoice(docId: string) {
     try {
-      const { data: invoices, error } = await supabase
+      const { error } = await supabase.from('invoices').delete().eq('id', docId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.log(error);
+    }
+
+    deleteInvoice(docId);
+
+    await navigateTo('/');
+  }
+
+  async function getInvoices() {
+    // invoicesLoaded.value = false;
+    try {
+      const { data, error } = await supabase
         .from('invoices')
         .select('*')
-        .order('id', { ascending: true });
-      invoiceData.value = invoices as Invoice[];
+        .order('invoiceId', { ascending: false });
 
-      invoiceData.value?.forEach((invoice: Invoice) => {
-        const contact = {
+      invoiceData.value = data as InvoiceWithItems[];
+
+      invoiceData.value?.forEach((invoice: InvoiceWithItems) => {
+        const contact: Contact = {
           clientCompany: invoice.clientCompany,
           clientName: invoice.clientName,
           clientName2: invoice.clientName2,
@@ -57,174 +98,43 @@ export const useStore = defineStore('main', () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }
 
-  const setCurrentInvoice = (payload: number) => {
-    currentInvoice.value = invoiceData.value?.find((invoice: Invoice) => {
-      return invoice.id === payload;
-    });
-  };
-
-  const editCurrentInvoice = () => {
-    editInvoice.value = !editInvoice.value;
-  };
-
-  const deleteInvoice = (payload: number) => {
-    invoiceData.value = invoiceData.value?.filter(
-      (invoice: any) => invoice.id !== payload
-    ) as Invoice[];
-  };
-
-  const updateCurrentInvoice = async (payload: number) => {
-    deleteInvoice(payload);
-    await getInvoices();
-    toggleInvoice();
-    editCurrentInvoice();
-    setCurrentInvoice(payload as number);
-  };
-
-  const deleteCurrentInvoice = async (docId: number) => {
+  async function uploadToSupabase(invoice: InvoiceWithItems) {
     try {
-      const { error } = await supabase.from('invoices').delete().eq('id', docId);
-      // console.log(data);
+      const { error } = await supabase.from('invoices').insert([invoice as never]);
 
       if (error) throw error;
     } catch (error) {
       console.log(error);
     }
-
-    deleteInvoice(docId);
-
-    await navigateTo('/');
-  };
-
-  const updateStatusToPaid = async (payload: number): Promise<void> => {
-    try {
-      const statusFields = {
-        invoicePending: false,
-        invoiceDraft: false,
-        invoicePaid: true,
-      };
-
-      const { error } = await supabase
-        .from('invoices')
-        .update(statusFields as never)
-        .eq('id', payload);
-
-      if (error) throw error;
-    } catch (error) {
-      console.log(error);
-    }
-    invoiceData.value?.forEach((invoice: Invoice) => {
-      if (invoice.id === payload) {
-        invoice.invoicePaid = true;
-        invoice.invoicePending = false;
-        invoice.invoiceDraft = false;
-      }
-    });
-  };
-
-  const updateStatusToPending = async (payload: number): Promise<void> => {
-    try {
-      const statusFields = {
-        invoicePending: true,
-        invoiceDraft: false,
-        invoicePaid: false,
-      };
-
-      const { error } = await supabase
-        .from('invoices')
-        .update(statusFields as never)
-        .eq('id', payload);
-
-      if (error) throw error;
-    } catch (error) {
-      console.log(error);
-    }
-    invoiceData.value?.forEach((invoice: Invoice) => {
-      if (invoice.id === payload) {
-        invoice.invoicePaid = false;
-        invoice.invoicePending = true;
-        invoice.invoiceDraft = false;
-      }
-    });
-  };
-
-  const userLogin = async ({ email, password }: Credentials): Promise<void> => {
-    try {
-      const { error } = await auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const userLogout = async () => {
-    try {
-      const { error } = await auth.signOut();
-
-      if (error) throw error;
-    } catch (error) {
-      console.log(error);
-    }
-
-    // const { error } = await auth.signOut();
-    // if (error) {
-    //   console.error(error);
-    // }
-
-    try {
-      await $fetch('/api/_supabase/session', {
-        method: 'POST',
-        body: { event: 'SIGNED_OUT', session: null },
-      });
-      user.value = null;
-    } catch (error) {
-      console.error(error);
-    }
-
-    await navigateTo('/login');
-  };
-
-  // const fetchUser = () => {
-  //   auth.onAuthStateChanged(async (fetchedUser) => {
-  //     if (fetchedUser === null) {
-  //       user.value = null;
-  //     } else {
-  //       user.value = fetchedUser;
-
-  //       if (router.isReady() && router.currentRoute.value.path === '/login') {
-  //         router.push('/');
-  //       }
-  //     }
-  //   });
-  // };
+  }
 
   return {
+    searchQuery,
+    filterQuery,
+    filterResults,
+    filteredInvoices,
+    notificationMsg,
+    isLoading,
     invoiceDialog,
+    closeBtn,
     modalActive,
-    invoiceData,
+    // invoiceData,
     contactData,
     invoicesLoaded,
-    currentInvoice,
+    // currentInvoice,
     editInvoice,
     customModal,
     modalType,
     toggleInvoice,
     toggleModal,
     getInvoices,
-    setCurrentInvoice,
+    // setCurrentInvoice,
     editCurrentInvoice,
     deleteCurrentInvoice,
     updateCurrentInvoice,
-    updateStatusToPaid,
-    updateStatusToPending,
-    userLogin,
-    userLogout,
-    // fetchUser,
+
+    uploadToSupabase,
   };
 });

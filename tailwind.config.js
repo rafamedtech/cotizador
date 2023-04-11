@@ -50,7 +50,7 @@ module.exports = {
       {
         mytheme: {
           primary: '#fe6847',
-          neutral: '#fe6847',
+          neutral: '#181818',
         },
       },
       // 'light',

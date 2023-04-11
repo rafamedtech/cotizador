@@ -1,68 +1,139 @@
 <script setup>
 // Imports
-import { useStore } from '@/stores/main';
-import { storeToRefs } from 'pinia';
+import noResults from '@/assets/images/no-results.svg';
 
 const store = useStore();
+const { toggleInvoice } = store;
+const { isLoading, invoicesLoaded, invoiceDialog, searchQuery, filterQuery, filterResults } =
+  storeToRefs(store);
 
-const { getInvoices, toggleInvoice } = store;
-const { invoiceData, invoicesLoaded } = storeToRefs(store);
+// const invoices = computed(() => invoiceData.value);
+const { invoices, getInvoices } = await useInvoices();
+await getInvoices();
+invoicesLoaded.value = true;
 
-function searchInvoices(input) {
-  invoices.value = invoiceData.value.filter((invoice) => {
-    return invoice.clientCompany.toLowerCase().includes(input.toLowerCase());
-  });
-}
+const filterMenu = ref(true);
+const filteredInvoices = ref([]);
 
-const invoices = ref([]);
+// onBeforeMount(() => {
+//   invoicesLoaded.value = false;
+// });
+filteredInvoices.value = invoices.value;
 
 onMounted(() => {
-  invoices.value = invoiceData.value;
+  // filteredInvoices.value = invoices.value;
+  setTimeout(() => {
+    isLoading.value = false;
+    invoicesLoaded.value = true;
+  }, 1000);
+  if (filterQuery.value) {
+    searchInvoices();
+  }
 });
 
+// // const { getInvoices } = await useInvoices();
+// watch(invoices, () => {
+//   searchInvoices();
+// });
+
+// filteredInvoices.value = invoiceData.value;
+const searchSubmit = ref(false);
+function searchInvoices() {
+  searchSubmit.value = true;
+
+  // console.log(event);
+  filterMenu.value = false;
+
+  invoicesLoaded.value = false;
+  // invoiceDialog.value = false;
+
+  isLoading.value = true;
+
+  setTimeout(() => {
+    isLoading.value = false;
+
+    invoicesLoaded.value = true;
+  }, 1000);
+
+  if (filterQuery.value === 'Todas') {
+    filteredInvoices.value = invoices.value.filter((invoice) => {
+      return invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase());
+    });
+  } else {
+    filteredInvoices.value = invoices.value.filter((invoice) => {
+      return (
+        invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
+        invoice.status === filterQuery.value
+      );
+    });
+  }
+
+  if (filteredInvoices.value.length === 0) {
+    filterResults.value = false;
+  } else {
+    filterResults.value = true;
+  }
+}
+
+// searchInvoices();
+
+// onMounted(() => {
+//   filteredInvoices.value = invoices.value;
+//   searchInvoices();
+// });
+
+// setTimeout(() => {
+//   isLoading.value = false;
+//   invoicesLoaded.value = true;
+// }, 1000);
+// searchInvoices();
+
+function searchCleared() {
+  filterMenu.value = true;
+  filterStatus.value = 'Todas';
+}
+
+const invoiceBtn = ref(null);
+
 const newInvoice = () => {
-  toggleInvoice();
+  return navigateTo('nueva-cotizacion');
+  // invoiceBtn.value.click();
+  // toggleInvoice();
+
+  // const html = document.querySelector('html');
+  // html.style.overflowY = 'hidden';
 };
 
-// const filterMenu = ref(false);
-// const toggleFilterMenu = () => {
-//   filterMenu.value = !filterMenu.value;
-// };
+// function filterInvoices(status) {
+//   filterResults.value = true;
+//   invoicesLoaded.value = false;
 
-// const filteredInvoice = ref('');
-
-// const filteredInvoices = (e) => {
-//   if (e.target.innerText === 'Todas') {
-//     filteredInvoice.value = '';
-//     return;
-//   }
-
-//   filteredInvoice.value = e.target.innerText;
-// };
-
-// const filteredData = computed(() => {
-//   return invoiceData.value.filter((invoice) => {
-//     if (filteredInvoice.value === 'Borrador') {
-//       return invoice.invoiceDraft === true;
-//     }
-//     if (filteredInvoice.value === 'Pendiente') {
-//       return invoice.invoicePending === true;
-//     }
-//     if (filteredInvoice.value === 'Vendido') {
-//       return invoice.invoicePaid === true;
+//   isLoading.value = true;
+//   setTimeout(() => {
+//     if (status === 'Todas') {
+//       invoices.value = [...invoiceData.value];
+//     } else {
+//       invoices.value = [
+//         ...invoiceData.value.filter((invoice) => {
+//           return invoice.status === status;
+//         }),
+//       ];
 //     }
 
-//     return invoice;
-//   });
-// });
+//     isLoading.value = false;
+//     invoicesLoaded.value = true;
 
-// watch(filteredInvoice, () => {
-//   filteredData.value = invoiceData.value.filter((item) =>
-//     item.clientCompany.toLowerCase().includes(filteredInvoice.value.toLowerCase())
-//   );
-// });
+//     if (invoices.value.length === 0) {
+//       filterResults.value = false;
+//     } else {
+//       filterResults.value = true;
+//     }
+//   }, 1000);
+// }
 
-await getInvoices();
+const filterStatus = ref('Todas');
+
+// await getInvoices();
 
 definePageMeta({
   middleware: ['auth'],
@@ -74,227 +145,162 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="home custom-container">
+  <div class="custom-container">
     <!-- Header -->
     <div>
-      <div class="header flex">
+      <div class="mb-8 flex justify-between">
         <div class="left flex flex-col">
           <h1 class="text-2xl text-primary dark:text-primary/50 lg:text-3xl">Cotizaciones</h1>
           <span class="text-sm text-dark-strong dark:text-light-strong"
-            >Tienes (<span class="text-primary dark:text-primary/50">{{ invoiceData.length }}</span
+            >Tienes (<span class="text-primary dark:text-primary/50">{{ invoices.length }}</span
             >) en total</span
           >
-          <button @click="cambiarNombre"></button>
         </div>
         <div class="right flex flex-col-reverse items-end gap-4 lg:flex-row lg:items-center">
-          <!-- <div
-            tabindex="0"
-            @click="toggleFilterMenu"
-            @keypress.enter="toggleFilterMenu"
-            @keypress.space="toggleFilterMenu"
-            class="flex gap-2 filter dark:text-light-medium"
-          >
-            <span
-              >Filtrar etapa
-              <span class="text-secondary" v-if="filteredInvoice"
-                >: {{ filteredInvoice }}</span
-              ></span
-            >
-            <Icon name="icon-park-outline:down" />
-            <ul
-              v-show="filterMenu"
-              class="filter-menu bg-light-medium outline-none dark:bg-dark-strong lg:mr-10"
-            >
-              <li @click="filteredInvoices">Borrador</li>
-              <li @click="filteredInvoices">Pendiente</li>
-              <li @click="filteredInvoices">Vendido</li>
-              <li @click="filteredInvoices">Todas</li>
-            </ul>
-          </div> -->
-          <div
+          <label ref="invoiceBtn" for="my-modal-3" class="hidden"> </label>
+          <button
+            class="btn-primary btn-square btn w-fit px-2 text-light-medium hover:border-primary/50 hover:bg-primary/50 dark:border-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
             @click="newInvoice"
-            @keypress.enter="newInvoice"
-            @keypress.space="newInvoice"
-            class="btn flex gap-2 border-none bg-primary text-light-medium hover:bg-primary/50 dark:bg-primary/50 dark:text-light-strong dark:hover:bg-primary dark:hover:text-light-medium"
-            tabindex="0"
           >
-            <div class="inner-button flex">
-              <Icon name="icon-park-outline:plus" class="text-2xl" />
-            </div>
+            <Icon name="icon-park-outline:plus" class="text-2xl" />
+
             <span>Cotización</span>
-          </div>
+          </button>
         </div>
       </div>
+
       <!-- Invoices -->
 
-      <div>
+      <div class="w-full">
         <!-- Search box -->
-        <section class="flex items-center justify-between">
-          <SearchBar @@search="searchInvoices($event)" />
-          <div class="dropdown-bottom dropdown-end dropdown">
+        <section class="flex w-full items-center justify-between">
+          <SearchBar @@search="searchInvoices($event)" @@clear="searchCleared" />
+
+          <!-- <div class="dropdown-bottom dropdown-end dropdown">
+            <span class="text-dark-strong dark:text-light-medium">{{ filterStatus }}</span>
             <Icon
               size="32"
               tabindex="0"
               name="mdi:dots-vertical"
               class="cursor-pointer text-dark-medium dark:text-light-medium"
             />
-            <!-- <Icon
-              :size="32"
-              tabindex="0"
-              name="icon-park-outline:down"
-              class="cursor-pointer text-dark-medium dark:text-light-medium"
-            /> -->
 
             <ul
               tabindex="0"
               class="dark dropdown-content menu rounded-box w-52 bg-white p-2 text-dark-strong shadow dark:bg-dark-strong dark:text-light-medium"
             >
-              <li class="hover:text-primary"><button>Todas</button></li>
-              <li class="hover:text-primary"><button>Vendidas</button></li>
-              <li class="hover:text-primary"><button>Pendiente</button></li>
-              <li class="hover:text-primary"><button>Borrador</button></li>
+              <span class="py-2 pl-2 italic text-primary">Filtrar por etapa</span>
+              <li class="cursor-pointer hover:text-primary">
+                <label @click="filterInvoices('Todas')"> Todas </label>
+                <input
+                  class="hidden"
+                  type="radio"
+                  name="filterStatus"
+                  value="Todas"
+                  v-model="filterStatus"
+                />
+              </li>
+              <li class="hover:text-primary">
+                <label @click="filterInvoices('Vendida')">
+                  <input
+                    class="hidden"
+                    type="radio"
+                    name="filterStatus"
+                    value="Vendidas"
+                    v-model="filterStatus"
+                  />
+                  Vendidas
+                </label>
+              </li>
+              <li class="hover:text-primary">
+                <label @click="filterInvoices('Borrador')">
+                  <input
+                    class="hidden"
+                    type="radio"
+                    name="filterStatus"
+                    value="Borrador"
+                    v-model="filterStatus"
+                  />
+                  Borrador
+                </label>
+              </li>
+              <li class="hover:text-primary">
+                <label @click="filterInvoices('Pendiente')">
+                  <input
+                    class="hidden"
+                    type="radio"
+                    name="filterStatus"
+                    value="Pendiente"
+                    v-model="filterStatus"
+                  />
+                  Pendiente
+                </label>
+              </li>
             </ul>
-          </div>
+          </div> -->
         </section>
 
         <section
-          class="relative flex w-full justify-between py-7 px-4 text-dark-strong transition-all duration-300 dark:text-light-medium lg:px-8"
+          class="relative mt-8 flex w-full items-center justify-between rounded-2xl py-7 px-4 text-primary transition-all duration-300 focus:outline-primary lg:px-8"
         >
-          <p>ID</p>
-          <p class="hidden w-1/5 lg:block">Fecha</p>
-          <p class="w-1/5">Empresa</p>
-          <p class="w-1/5">Total</p>
-          <p class="w-1/5">Status</p>
+          <p class="w-[5%] lg:w-[10%]">ID</p>
+          <p class="w-[20%]">Fecha</p>
+          <p class="w-[30%] lg:w-[25%]">Empresa</p>
+          <p class="hidden w-[25%] lg:block">Status</p>
+          <p class="w-[20%]">Total</p>
         </section>
-        <section class="flex flex-col items-center gap-4" v-if="invoicesLoaded">
-          <LoadingSpinner v-if="!invoices.length" />
-          <MyInvoice v-for="invoice in invoices" :invoice="invoice" :key="invoice.id" />
-          <!-- <InvoiceTable>
-            <InvoiceRow v-for="invoice in invoices" :invoice="invoice" :key="invoice.id" />
-          </InvoiceTable> -->
-        </section>
+
+        <!-- <ClientOnly>
+          <TransitionGroup
+            tag="section"
+            v-if="invoicesLoaded && !filterResults"
+            class="flex flex-col items-center gap-4"
+            name="slide-up"
+            appear
+          >
+            <MyInvoice
+              v-for="(invoice, index) in invoices"
+              :style="{ transitionDelay: `${index * 100}ms` }"
+              :invoice="invoice"
+              :key="invoice.id"
+            />
+          </TransitionGroup>
+        </ClientOnly> -->
+
+        <ClientOnly>
+          <TransitionGroup
+            v-if="invoicesLoaded && filterResults"
+            tag="section"
+            class="flex flex-col items-center gap-10 lg:gap-4"
+            name="slide-up"
+            appear
+          >
+            <MyInvoice
+              v-for="(invoice, index) in filteredInvoices"
+              :style="{ transitionDelay: `${index * 100}ms` }"
+              :invoice="invoice"
+              :key="invoice.invId"
+            />
+          </TransitionGroup>
+        </ClientOnly>
+
+        <!-- No filter results -->
+
+        <div
+          v-if="filteredInvoices.length === 0 && !isLoading && !filterResults"
+          class="mt-16 w-full text-center"
+        >
+          <img :src="noResults" class="mx-auto mb-8 w-32" alt="" />
+          <span class="text-dark-medium dark:text-light-medium">No se encontraron resultados</span>
+        </div>
+
+        <LoadingSpinner class="pt-16" v-if="isLoading" />
       </div>
 
-      <div v-if="invoiceData.length < 1" class="empty flex flex-col dark:text-light-strong">
-        <img src="@/assets/images/illustration-empty.svg" alt="" />
-        <h3>No hay cotizaciones</h3>
-        <p>
-          Crea una nueva cotización haciendo click en el botón
-          <span class="text-primary dark:text-primary/50">+Cotización</span>
-        </p>
-      </div>
+      <!-- If no invoices -->
+      <NoInvoices v-if="invoices.length === 0 && invoicesLoaded && !isLoading" />
     </div>
+
+    <!-- <NewInvoiceModal /> -->
   </div>
 </template>
-
-<style lang="scss" scoped>
-.home {
-  color: #181818;
-
-  .header {
-    margin-bottom: 65px;
-
-    .left,
-    .right {
-      flex: 1;
-    }
-
-    .right {
-      justify-content: flex-end;
-      // align-items: center;
-
-      .button,
-      .filter {
-        align-items: center;
-
-        span {
-          font-size: 11px;
-        }
-      }
-
-      .filter {
-        position: relative;
-        // margin-right: 40px;
-        cursor: pointer;
-
-        img {
-          margin-left: 12px;
-          width: 9px;
-          height: 5px;
-        }
-
-        .filter-menu {
-          width: 120px;
-          z-index: 999;
-          position: absolute;
-          top: 25px;
-          right: 0;
-          list-style: none;
-          // background-color: #fff;
-          border-radius: 10px;
-          // background-color: #1e2139;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-          @media (min-width: 768px) {
-            right: -50px;
-          }
-
-          li {
-            cursor: pointer;
-            font-size: 12px;
-            padding: 10px 20px;
-
-            &:hover {
-              color: #1e2139;
-              background-color: #dfa48c;
-              border-radius: 10px;
-            }
-          }
-        }
-      }
-
-      .button {
-        padding: 8px 10px;
-        background-color: #e90f02;
-        border-radius: 40px;
-
-        .inner-button {
-          margin-right: 8px;
-          border-radius: 50%;
-          padding: 8px;
-          align-items: center;
-          justify-content: center;
-          background-color: #fff;
-          img {
-            width: 10px;
-            height: 10px;
-          }
-        }
-      }
-    }
-  }
-
-  .empty {
-    margin-top: 160px;
-    align-items: center;
-
-    img {
-      width: 214px;
-      height: 200px;
-    }
-
-    h3 {
-      font-size: 20px;
-      margin-top: 40px;
-    }
-
-    p {
-      text-align: center;
-      max-width: 224px;
-      font-size: 12px;
-      font-weight: 300;
-      margin-top: 16px;
-    }
-  }
-}
-</style>

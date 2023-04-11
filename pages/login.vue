@@ -1,10 +1,9 @@
 <script setup>
 import useVuelidate from '@vuelidate/core';
 import { required, email, minLength, helpers } from '@vuelidate/validators';
-import { useStore } from '@/stores/main';
 
 const user = useSupabaseUser();
-const { userLogin } = useStore();
+const { userLogin } = useAuthStore();
 
 const isLoading = ref(false);
 

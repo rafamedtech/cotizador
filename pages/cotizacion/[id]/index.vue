@@ -1,29 +1,56 @@
 <script lang="ts" setup>
 // Imports
-import { useStore } from '@/stores/main';
-import { storeToRefs } from 'pinia';
 // import emailjs from "@emailjs/browser";
+import type { InvoiceWithItems } from '@/types/invoice';
+import { RemovableRef } from '@vueuse/shared';
 
 // Definitions
 const { params } = useRoute();
-const { user, invoiceData, currentInvoice } = storeToRefs(useStore());
-const { editCurrentInvoice, toggleInvoice, updateStatusToPaid, updateStatusToPending } = useStore();
+const store = useStore();
 
-currentInvoice.value = invoiceData.value.find((invoice: any) => {
-  return invoice.id.toString() === params.id.toString();
-});
+const { id }: any = params;
+const { currentInvoice } = await useInvoice(id);
+const invoiceItemList = currentInvoice.value?.invoiceItem;
+
+const { editCurrentInvoice, toggleInvoice, getInvoices } = store;
+const user = useSupabaseUser();
+
+// setCurrentInvoice(params.id.toString());
 
 const toggleEditInvoice = () => {
   editCurrentInvoice();
-  toggleInvoice();
+  invoiceBtn.value?.click();
+  const html = document.querySelector('html');
+  if (html) {
+    html.style.overflowY = 'hidden';
+  }
 };
 
 const deleteInvoice = () => {
-  useStore().$patch({
+  store.$patch({
     customModal: true,
     modalType: 'delete',
   });
 };
+
+const iconName = computed((): string => {
+  if (currentInvoice.value?.status === 'Vendida') {
+    return 'icon-park-outline:check-one';
+  }
+
+  if (currentInvoice.value?.status === 'Borrador') {
+    return 'ri:draft-line';
+  }
+
+  if (currentInvoice.value?.status === 'Pendiente') {
+    return 'icon-park-outline:caution';
+  }
+  if (currentInvoice.value?.status === 'Cancelada') {
+    return 'material-symbols:cancel-outline';
+  }
+
+  return '';
+});
 
 // const sendEmail = () => {
 //   emailjs
@@ -60,57 +87,48 @@ const deleteInvoice = () => {
 //     }
 //   }, 1000);
 // };
-// const sendEmail = () => {
-//   // const tempA = /*html*/ encodeURI(
-//   //   `<a href="${location.toString()}">Abrir Cotización</a>`
-//   // );
-//   const tempBody = `Hola ${currentInvoice.value.clientName}${
-//     currentInvoice.value.clientName2 ? "/" : ""
-//   }${currentInvoice.value.clientName2},
 
-// Tu cotización se encuentra disponible dando click en el siguiente enlace:
-
-// ${location.toString()}
-
-// Quedo a sus órdenes,
-// GCO Soluciones Industriales`;
-
-//   const body = encodeURI(tempBody);
-
-//   const subject = "Tu cotización de GCO Soluciones Industriales esta lista!";
-
-//   setTimeout(() => {
-//     // useStore().$patch({
-//     //   customModal: true,
-//     //   modalType: "email",
-//     // });
-//     if (currentInvoice.value.invoiceDraft) {
-//       updateStatusToPending(currentInvoice.value.docId);
-//     }
-//   }, 1000);
-
-//   window.open(
-//     `mailto:${currentInvoice.value.clientEmail}, ${currentInvoice.value?.clientEmail2}?subject=${subject}&bcc='orlando@gcosoluciones.com'&body=${body}`
-//   );
-// Email.send({
-//   Host: "gcosoluciones.com",
-//   Username: "no-reply@gcosoluciones.com",
-//   Password: "RafaEL2022_eLL0q1ll0",
-//   To: currentInvoice.value.clientEmail,
-//   From: "no-reply@gcosoluciones.com",
-//   Subject: "This is the subject",
-//   Body: "And this is the body",
-// }).then((message) => alert(message));
-// };
-
-const generatePDF = (): void => {
+const generatePDF = () => {
   useStore().$patch({
     customModal: true,
     modalType: 'print',
   });
 };
 
+const statusModal = ref(false);
+function changeStatusModal() {
+  statusModal.value = true;
+}
+
+// const { changeInvoiceStatus } = useInvoice();
+async function changeStatus(status: string) {
+  if (currentInvoice.value) {
+    if (currentInvoice.value.status === status) {
+      return;
+    }
+    currentInvoice.value.status = status;
+  }
+
+  statusModal.value = false;
+  // await changeInvoiceStatus(currentInvoice.value?.invoiceId, status);
+}
+
+const invoiceBtn = ref<HTMLInputElement | null>(null);
+
 definePageMeta({
+  middleware: async function ({ params }, from) {
+    const { id }: any = params;
+    const { currentInvoice } = await useInvoice(id);
+
+    if (!currentInvoice) {
+      return abortNavigation(
+        createError({
+          statusCode: 404,
+          message: 'No se encontro la cotizacion',
+        })
+      );
+    }
+  },
   pageTransition: {
     name: 'slide',
     mode: 'out-in',
@@ -124,96 +142,101 @@ definePageMeta({
   >
     <div v-if="currentInvoice" class="invoice-view my-container mb-4 print:hidden">
       <NuxtLink class="nav-link flex gap-2" :to="{ name: 'index' }">
-        <Icon class="text-2xl text-primary" name="icon-park-outline:back" />
+        <Icon class="text-2xl text-primary" name="heroicons-solid:arrow-left" />
         <span class="text-dark-medium dark:text-light-strong">Regresar</span>
       </NuxtLink>
       <!-- Header -->
       <div class="header flex flex-col gap-4 bg-white shadow-lg dark:bg-dark-strong lg:flex-row">
-        <!-- <div v-if="user" class="header flex flex-col gap-4 shadow-lg lg:flex-row"> -->
-        <div class="left flex flex-col gap-2 lg:flex-row">
-          <span class="text-dark-medium dark:text-light-strong">Etapa</span>
-          <!-- <div class="status-button flex gap-2 py-2 px-4 lg:mr-2 lg:px-8"> -->
-          <div
-            class="status-button flex gap-2 py-2 px-4 lg:mr-2 lg:px-8"
-            :class="{
-              paid: currentInvoice.invoicePaid,
-              draft: currentInvoice.invoiceDraft,
-              pending: currentInvoice.invoicePending,
-            }"
-          >
-            <!-- <span class="flex items-center gap-2"> -->
-            <span class="flex items-center gap-2" v-if="currentInvoice.invoicePaid">
-              <!-- <i class="fa-regular fa-circle-check text-base text-green-500"></i> -->
-              <Icon name="icon-park-outline:check-one" class="text-base text-green-500" />
-              Vendido
-            </span>
-            <span class="flex items-center gap-2" v-if="currentInvoice.invoiceDraft"
-              ><Icon name="ri:draft-line" class="text-base text-gray-500" />Borrador</span
+        <div class="dropdown-bottom dropdown form-control relative mb-4 h-full w-1/2 items-end">
+          <label class="label w-full text-left">
+            <span class="label-text text-dark-strong dark:text-light-medium">Etapa</span>
+          </label>
+          <StatusButton :status="currentInvoice.status" @@modal="changeStatusModal" />
+          <!-- <div class="form-control relative flex w-full flex-row">
+            <label ref="invoiceBtn" for="my-modal-3" class="hidden"> </label>
+            <button
+              type="button"
+              @click="changeStatusModal"
+              class="status-button input"
+              :class="{
+                draft: currentInvoice.status === 'Borrador',
+                pending: currentInvoice.status === 'Pendiente',
+                paid: currentInvoice.status === 'Vendida',
+                canceled: currentInvoice.status === 'Cancelada',
+              }"
             >
-
-            <span class="flex items-center gap-2" v-if="currentInvoice.invoicePending">
-              <!-- <i class="fa-solid fa-circle-exclamation text-base text-secondary"></i> -->
-              <Icon name="icon-park-outline:caution" class="text-base text-secondary" />
-              Pendiente</span
+              <Icon :name="iconName" class="text-base" />
+              {{ currentInvoice.status }}
+            </button>
+          </div> -->
+          <div class="w-full">
+            <ul
+              v-if="statusModal"
+              class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-[10px] bg-white p-2 shadow-lg transition-all dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong"
             >
+              <li
+                v-if="currentInvoice.status === 'Borrador'"
+                class="cursor-pointer text-dark-medium dark:text-light-medium dark:hover:text-primary"
+              >
+                <button type="button" @click="changeStatus('Pendiente')">
+                  <Icon name="icon-park-outline:caution" class="text-base text-secondary" />
+                  Pendiente
+                </button>
+              </li>
+              <li
+                class="cursor-pointer text-dark-medium dark:text-light-medium dark:hover:text-primary"
+              >
+                <button type="button" @click="changeStatus('Vendida')">
+                  <Icon name="icon-park-outline:check-one" class="text-base text-green-500" />
+                  Vendida
+                </button>
+              </li>
+              <li
+                v-if="currentInvoice.status === 'Vendida'"
+                class="cursor-pointer text-dark-medium dark:text-light-medium dark:hover:text-primary"
+              >
+                <button type="button" @click="changeStatus('Cancelada')">
+                  <Icon name="material-symbols:cancel-outline" class="text-base text-red-500" />
+                  Cancelada
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
 
         <!-- Status bar -->
         <div class="right flex items-center justify-center gap-3">
-          <button
+          <NuxtLink
+            v-if="currentInvoice.status === 'Borrador' || currentInvoice.status === 'Pendiente'"
+            :to="`/cotizacion/${currentInvoice.invId}/edit-invoice`"
             class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-[#f2f2f2] p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium lg:text-[10px]"
-            @click="toggleEditInvoice"
           >
+            <!-- @click="toggleEditInvoice" -->
             <Icon
               name="icon-park-outline:edit"
               class="text-xl text-dark-medium dark:text-light-strong"
             />
             <span class="text-dark-medium dark:text-light-strong">Editar</span>
-          </button>
+          </NuxtLink>
           <button
-            @click="deleteInvoice()"
-            class="flex w-16 flex-col items-center justify-center gap-2 rounded-[10px] border-none bg-light-medium p-4 text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            @click="deleteInvoice"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-[#f2f2f2] p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium lg:text-[10px]"
           >
             <Icon class="text-xl text-primary" name="icon-park-outline:delete" />
 
             <span class="text-dark-medium dark:text-light-strong">Eliminar</span>
           </button>
-          <!-- @click="updateStatusToPaid(currentInvoice.docId)" -->
-          <button
-            v-if="currentInvoice.invoicePending"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
-            @click="updateStatusToPaid(currentInvoice?.id)"
-          >
-            <!-- <i class="fa-regular fa-circle-check text- text-green-500"></i> -->
-            <Icon class="text-xl text-green-500" name="icon-park-outline:check-one" />
-            Vendido
-          </button>
-          <!-- <button
-            class="flex h-14 w-14 flex-col items-center justify-center gap-0 rounded-[10px] border-none bg-light-medium px-2 py-8 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
-          > -->
-          <button
-            v-if="currentInvoice.invoiceDraft || currentInvoice.invoicePaid"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-[#f2f2f2] p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium lg:text-[10px]"
-            @click="updateStatusToPending(currentInvoice.id)"
-          >
-            <!-- <i class="fa-solid fa-circle-exclamation text-base text-secondary"></i> -->
-            <Icon class="text-xl text-secondary" name="icon-park-outline:caution" />
-            <span class="text-dark-strong dark:text-light-strong">Pendiente</span>
-          </button>
+
           <button
             @click="generatePDF"
             class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
           >
-            <!-- <i class="fa-solid fa-file-pdf text-base"></i> -->
             <Icon name="icon-park-outline:doc-detail" class="text-xl" />
             PDF
           </button>
-          <!-- @click="sendEmail" -->
           <button
             class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
           >
-            <!-- <i class="fa-regular fa-paper-plane text-base text-blue-500"></i> -->
             <Icon name="icon-park-outline:envelope-one" class="text-xl text-blue-500" />
             Enviar
           </button>
@@ -282,8 +305,9 @@ definePageMeta({
           </h1>
           <div class="flex flex-col items-end">
             <p class="dark:text-light font-bold uppercase text-dark-medium dark:text-light-strong">
-              #{{ currentInvoice.id }}
+              #{{ id }}
             </p>
+
             <!-- <p class="font-bold uppercase">#{{ currentInvoice.invoiceId }}</p> -->
 
             <h3 class="text-[9px] text-primary dark:text-primary/50 lg:text-base">Fecha</h3>
@@ -389,7 +413,8 @@ definePageMeta({
                 class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
               >
                 <!-- Exchange -->
-                {{ currentInvoice?.exchangeCost ? '$' : '' }}{{ currentInvoice?.exchangeCost }}
+                {{ currentInvoice?.exchangeCost ? '$' : ''
+                }}{{ currentInvoice?.exchangeCost ? currentInvoice?.exchangeCost : 'N/A' }}
               </p>
             </li>
           </ul>
@@ -407,7 +432,7 @@ definePageMeta({
           <h5
             class="py-2 font-bold text-primary dark:text-primary/50 print:w-1/12 print:basis-1/12 lg:basis-[10%]"
           >
-            No parte
+            # parte
           </h5>
           <div class="w-72 print:w-7/12 lg:basis-5/12">
             <h5 class="w-full py-2 text-center font-bold text-primary dark:text-primary/50">
@@ -433,7 +458,7 @@ definePageMeta({
         > -->
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
-          v-for="(item, index) in currentInvoice?.invoiceItemList"
+          v-for="(item, index) in invoiceItemList"
           :key="index"
         >
           <!-- <p class="w-6 py-2">{{ item.id }}</p> -->
@@ -480,12 +505,12 @@ definePageMeta({
 
       <!-- Terms and total sections -->
       <section
-        class="flex max-h-40 w-full flex-col-reverse gap-4 overflow-y-hidden py-4 print:flex-row lg:flex-row"
+        class="flex w-full flex-col-reverse gap-4 overflow-y-hidden py-4 print:flex-row lg:flex-row"
       >
         <section
           class="flex w-full flex-col gap-4 overflow-y-hidden rounded-[20px] bg-white px-6 py-4 shadow-lg dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:pr-0 lg:w-4/5 lg:flex-row"
         >
-          <div class="overflow-y-hidden print:w-3/5 lg:w-1/2">
+          <div class="overflow-y-hidden print:w-2/5 lg:w-1/2">
             <h3
               class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong"
             >
@@ -515,7 +540,7 @@ definePageMeta({
           </div>
         </section>
         <section
-          class="flex w-full basis-[20%] flex-col justify-center rounded-[20px] bg-white px-6 py-4 shadow-lg dark:bg-dark-strong print:basis-1/5 print:px-4 lg:w-1/5"
+          class="flex w-full basis-[30%] flex-col justify-center rounded-[20px] bg-white px-6 py-4 shadow-lg dark:bg-dark-strong print:basis-[30%] print:px-4 lg:w-1/5"
         >
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
