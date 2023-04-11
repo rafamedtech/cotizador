@@ -9,7 +9,7 @@ const { isLoading, invoicesLoaded, invoiceDialog, searchQuery, filterQuery, filt
 
 // const invoices = computed(() => invoiceData.value);
 const { invoices, getInvoices } = await useInvoices();
-await getInvoices();
+// await getInvoices();
 invoicesLoaded.value = true;
 
 const filterMenu = ref(true);

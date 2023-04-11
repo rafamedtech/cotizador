@@ -5,9 +5,9 @@
 
 // Definitions
 const { modalActive, customModal } = storeToRefs(useStore());
-const { getInvoices } = await useInvoices();
+// const { getInvoices } = await useInvoices();
 
-await getInvoices();
+// await getInvoices();
 
 // fetchUser();
 </script>
