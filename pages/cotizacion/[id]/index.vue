@@ -119,6 +119,8 @@ definePageMeta({
   middleware: async function ({ params }, from) {
     const { id }: any = params;
     const { currentInvoice } = await useInvoice(id);
+    const { getInvoices } = await useInvoices();
+    await getInvoices();
 
     if (!currentInvoice) {
       return abortNavigation(
