@@ -4,12 +4,19 @@ import type { InvoiceOutline } from '@/types/invoice';
 defineProps<{
   invoice: InvoiceOutline;
 }>();
+
+// const route = useRoute();
+const store = useStore();
+const { isLoadingFull } = storeToRefs(store);
+
+// function openInvoice() {}
 </script>
 
 <template>
   <NuxtLink
     :to="{ path: `/cotizacion/${invoice.invId}` }"
     class="relative flex h-32 w-full items-center justify-between gap-0 rounded-2xl bg-white py-7 px-4 text-dark-medium transition-all duration-300 hover:shadow-lg focus:outline-primary dark:bg-dark-strong dark:text-light-medium lg:h-full lg:overflow-y-hidden lg:px-8"
+    @click="isLoadingFull = true"
   >
     <p class="w-[5%] text-xs lg:w-[10%]">#{{ invoice.invId }}</p>
     <p class="w-[20%] text-xs lg:text-base">{{ invoice.invoiceDate }}</p>

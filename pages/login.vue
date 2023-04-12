@@ -4,14 +4,8 @@ import { required, email, minLength, helpers } from '@vuelidate/validators';
 
 const user = useSupabaseUser();
 const { userLogin } = useAuthStore();
-const store = useStore();
-const { isLoadingFull } = storeToRefs(store);
 
 const isLoading = ref(false);
-
-setTimeout(() => {
-  isLoadingFull.value = false;
-}, 1000);
 
 const formData = reactive({
   email: '',
@@ -144,7 +138,7 @@ definePageMeta({
           class="rounded border-0 bg-primary py-2 px-8 font-sans font-bold text-white hover:bg-secondary focus:outline-white"
         >
           <span v-if="!isLoading">Enviar</span>
-          <Loader v-else />
+          <LoadingSpinner v-else />
         </button>
       </form>
     </section>

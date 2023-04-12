@@ -15,9 +15,9 @@ const { editCurrentInvoice } = store;
 const { isLoadingFull } = storeToRefs(store);
 const user = useSupabaseUser();
 
-setTimeout(() => {
-  isLoadingFull.value = false;
-}, 1000);
+isLoadingFull.value = false;
+// setTimeout(() => {
+// }, 1000);
 
 const toggleEditInvoice = () => {
   editCurrentInvoice();

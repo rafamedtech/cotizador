@@ -5,7 +5,7 @@
 const store = useStore();
 const authStore = useAuthStore();
 const { modalType } = storeToRefs(store);
-const { deleteCurrentInvoice, getInvoices } = store;
+// const { deleteCurrentInvoice, getInvoices } = store;
 const { userLogout } = authStore;
 
 const isLoading = ref(false);
@@ -128,7 +128,7 @@ const createPDF = () => {
             @click="toggleUserLogout"
             class="btn flex-[1] border-none bg-primary text-light-medium hover:bg-primary/50 focus:outline-primary dark:bg-primary/50 dark:hover:bg-primary"
           >
-            <Loader v-if="isLoading" />
+            <LoadingSpinner v-if="isLoading" />
             <span v-else>Aceptar</span>
           </button>
         </div>
