@@ -265,13 +265,13 @@ definePageMeta({
     <div
       class="relative mb-8 hidden h-fit bg-white print:hidden print:h-[700px] print:items-center print:justify-center"
     >
-      <figure class="h-full">
+      <!-- <figure class="h-full">
         <img
           class="h-auto w-full rounded-[20px]"
           src="@/assets/images/cover.jpg"
           alt="cover image"
         />
-      </figure>
+      </figure> -->
     </div>
 
     <!-- Invoice body -->
