@@ -13,7 +13,7 @@ defineProps<{
   >
     <p class="w-[5%] text-xs lg:w-[10%]">#{{ invoice.invId }}</p>
     <p class="w-[20%] text-xs lg:text-base">{{ invoice.invoiceDate }}</p>
-    <p class="w-[30%] overflow-x-hidden text-xs lg:w-[25%] lg:text-base">
+    <p class="w-[30%] overflow-hidden text-xs lg:w-[25%] lg:text-base">
       {{ invoice.clientCompany }}
     </p>
     <Transition name="slide-in" appear>
