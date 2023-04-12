@@ -23,10 +23,6 @@ onMounted(() => {
   }
 });
 
-onBeforeUnmount(() => {
-  isLoadingFull.value = true;
-});
-
 const searchSubmit = ref(false);
 const filterStatus = ref('Todas');
 function searchInvoices() {
@@ -69,6 +65,7 @@ const invoiceBtn = ref(null);
 
 const newInvoice = () => {
   return navigateTo('nueva-cotizacion');
+
   // const html = document.querySelector('html');
   // html.style.overflowY = 'hidden';
 };

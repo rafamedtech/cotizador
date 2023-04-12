@@ -18,9 +18,11 @@ const { editCurrentInvoice, toggleModal, toggleInvoice, uploadToSupabase } = sto
 
 isLoading.value = false;
 
-setTimeout(() => {
-  isLoadingFull.value = false;
-}, 1000);
+// onBeforeMount(() => {
+//   isLoadingFull.value = false;
+// });
+// setTimeout(() => {
+// }, 1000);
 
 const { params } = useRoute();
 const { id } = params;
