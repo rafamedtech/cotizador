@@ -2,8 +2,6 @@
 const store = useStore();
 const { invoiceDialog, searchQuery, filterQuery } = storeToRefs(store);
 
-
-
 const emit = defineEmits(['@search', '@clear']);
 
 const searchBarRef = ref(null);
@@ -41,7 +39,7 @@ function setContact(contact) {
 //   filterContacts();
 // });
 
-watch(contactsModal, () => {
+watch(contactsModal, async () => {
   const { contactData } = await useContact();
   filteredContacts.value = contactData.value;
 });
