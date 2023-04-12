@@ -117,21 +117,20 @@ async function changeStatus(status: string) {
 const invoiceBtn = ref<HTMLInputElement | null>(null);
 
 definePageMeta({
-  middleware: async function ({ params }, from) {
-    const { id }: any = params;
-    const { currentInvoice, getCurrentInvoice } = await useInvoice(id);
+  // middleware: async function ({ params }, from) {
+  //   const { currentInvoice, getCurrentInvoice } = await useInvoice(params.id as any);
 
-    await getCurrentInvoice(id);
+  //   await getCurrentInvoice(params.id as any);
 
-    if (!currentInvoice.value) {
-      return abortNavigation(
-        createError({
-          statusCode: 404,
-          message: 'No se encontro la cotizacion',
-        })
-      );
-    }
-  },
+  //   if (!currentInvoice.value) {
+  //     return abortNavigation(
+  //       createError({
+  //         statusCode: 404,
+  //         message: 'No se encontro la cotizacion',
+  //       })
+  //     );
+  //   }
+  // },
   pageTransition: {
     name: 'slide',
     mode: 'out-in',
