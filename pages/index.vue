@@ -3,25 +3,19 @@
 import noResults from '@/assets/images/no-results.svg';
 
 const store = useStore();
-const { toggleInvoice } = store;
-const { isLoading, invoicesLoaded, invoiceDialog, searchQuery, filterQuery, filterResults } =
-  storeToRefs(store);
+// const { toggleInvoice } = store;
+const { isLoading, invoicesLoaded, searchQuery, filterQuery, filterResults } = storeToRefs(store);
 
-// const invoices = computed(() => invoiceData.value);
 const { invoices } = await useInvoices();
-// await getInvoices();
+
 invoicesLoaded.value = true;
 
 const filterMenu = ref(true);
 const filteredInvoices = ref([]);
 
-// onBeforeMount(() => {
-//   invoicesLoaded.value = false;
-// });
 filteredInvoices.value = invoices.value;
 
 onMounted(() => {
-  // filteredInvoices.value = invoices.value;
   setTimeout(() => {
     isLoading.value = false;
     invoicesLoaded.value = true;
@@ -31,27 +25,15 @@ onMounted(() => {
   }
 });
 
-// // const { getInvoices } = await useInvoices();
-// watch(invoices, () => {
-//   searchInvoices();
-// });
-
-// filteredInvoices.value = invoiceData.value;
 const searchSubmit = ref(false);
 function searchInvoices() {
   searchSubmit.value = true;
-
-  // console.log(event);
   filterMenu.value = false;
-
   invoicesLoaded.value = false;
-  // invoiceDialog.value = false;
-
   isLoading.value = true;
 
   setTimeout(() => {
     isLoading.value = false;
-
     invoicesLoaded.value = true;
   }, 1000);
 
@@ -75,19 +57,6 @@ function searchInvoices() {
   }
 }
 
-// searchInvoices();
-
-// onMounted(() => {
-//   filteredInvoices.value = invoices.value;
-//   searchInvoices();
-// });
-
-// setTimeout(() => {
-//   isLoading.value = false;
-//   invoicesLoaded.value = true;
-// }, 1000);
-// searchInvoices();
-
 function searchCleared() {
   filterMenu.value = true;
   filterStatus.value = 'Todas';
@@ -97,9 +66,6 @@ const invoiceBtn = ref(null);
 
 const newInvoice = () => {
   return navigateTo('nueva-cotizacion');
-  // invoiceBtn.value.click();
-  // toggleInvoice();
-
   // const html = document.querySelector('html');
   // html.style.overflowY = 'hidden';
 };
@@ -133,7 +99,15 @@ const newInvoice = () => {
 
 const filterStatus = ref('Todas');
 
-// await getInvoices();
+// const contacts = computed(() => {
+//   return invoices.value.map((invoice) => ({
+//     clientCompany: invoice.clientCompany,
+//     clientName: invoice.clientName,
+//     clientName2: invoice.clientName2,
+//     clientEmail: invoice.clientEmail,
+//     clientEmail2: invoice.clientEmail2,
+//   }));
+// });
 
 definePageMeta({
   middleware: ['auth'],
@@ -287,7 +261,9 @@ definePageMeta({
         <!-- No filter results -->
 
         <div
-          v-if="filteredInvoices.length === 0 && !isLoading && !filterResults"
+          v-if="
+            filteredInvoices.length === 0 && invoices.length > 0 && !isLoading && !filterResults
+          "
           class="mt-16 w-full text-center"
         >
           <img :src="noResults" class="mx-auto mb-8 w-32" alt="" />

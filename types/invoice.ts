@@ -10,4 +10,8 @@ export interface InvoiceOutline {
   clientCompany: string;
   invoiceTotal: number;
   status: string;
+  clientName: string;
+  clientName2: string;
+  clientEmail: string;
+  clientEmail2: string;
 }

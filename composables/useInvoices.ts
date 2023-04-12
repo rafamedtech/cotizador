@@ -1,7 +1,11 @@
 import type { InvoiceOutline } from '@/types/invoice';
 
 export const useInvoices = async () => {
+  const store = useStore();
+  const { contactData } = storeToRefs(store);
+
   const invoices = ref<InvoiceOutline[]>([]);
+
   async function getInvoices() {
     const { data, error } = await useFetch<InvoiceOutline[]>('/api/invoices');
 
@@ -13,6 +17,16 @@ export const useInvoices = async () => {
     }
 
     invoices.value = data.value as InvoiceOutline[];
+
+    invoices.value.forEach((invoice: InvoiceOutline) => {
+      contactData.value.push({
+        clientCompany: invoice.clientCompany,
+        clientName: invoice.clientName,
+        clientName2: invoice.clientName2,
+        clientEmail: invoice.clientEmail,
+        clientEmail2: invoice.clientEmail2,
+      });
+    });
   }
 
   await getInvoices();

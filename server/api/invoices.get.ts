@@ -12,6 +12,10 @@ export default defineEventHandler((event) => {
       clientCompany: true,
       invoiceTotal: true,
       status: true,
+      clientName: true,
+      clientName2: true,
+      clientEmail: true,
+      clientEmail2: true,
     },
     orderBy: [
       {

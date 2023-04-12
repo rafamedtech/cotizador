@@ -12,6 +12,7 @@ function onSearch() {
 
 // Contacts autocomplete
 
+const { contactData } = storeToRefs(store);
 const uniqueContacts = ref(
   Array.from(new Set(contactData.value.map((a) => a.clientCompany))).map((clientCompany) => {
     return contactData.value.find((a) => a.clientCompany === clientCompany);
@@ -35,13 +36,8 @@ function setContact(contact) {
   searchQuery.value = contact;
 }
 
-// onMounted(() => {
-//   filterContacts();
-// });
-
-watch(contactsModal, async () => {
-  const { contactData } = await useContact();
-  filteredContacts.value = contactData.value;
+onMounted(() => {
+  filterContacts();
 });
 
 watch(searchQuery, () => {

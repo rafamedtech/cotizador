@@ -16,10 +16,14 @@ const error = useError();
       </p>
     </div>
     <div v-else class="prose ml-40 grid w-full place-content-center text-dark-medium">
-      <p>Al parecer esta pagina no existe</p>
-      <p>Lo sentimos mucho!</p>
-      <img :src="notFound" alt="" />
+      <img :src="notFound" alt="" class="mx-auto max-w-md" />
+      <p>Al parecer esta pagina no existe, lo sentimos mucho!</p>
+      <br />
       <p>
+        Revisa el enlace con el que intentaste abrir esta cotizacion <br />
+        o contacta a la persona que te la envio.
+      </p>
+      <p class="mt-4">
         <strong>{{ error.message }}</strong>
       </p>
     </div>
