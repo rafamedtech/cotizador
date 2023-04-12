@@ -3,7 +3,7 @@ const { modalActive, customModal, isLoadingFull } = storeToRefs(useStore());
 </script>
 
 <template>
-  <main>
+  <main class="relative">
     <NuxtLayout>
       <div
         class="relative flex flex-[1] flex-col overflow-x-auto bg-light-medium p-0 transition-all duration-300 dark:bg-[#222222]"
@@ -15,7 +15,7 @@ const { modalActive, customModal, isLoadingFull } = storeToRefs(useStore());
       </div>
     </NuxtLayout>
 
-    <div class="absolute inset-0 h-screen w-screen transition-all" v-if="isLoadingFull">
+    <div class="fixed inset-0 h-screen w-screen transition-all" v-if="isLoadingFull">
       <ScreenLoader />
     </div>
   </main>

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-screen w-screen">
+  <div class="relative h-full">
     <div class="blur-background absolute inset-0"></div>
     <div class="loading">
       <div>
@@ -15,10 +15,9 @@
 }
 .loading {
   @apply bg-light-medium/50 dark:bg-dark-medium/50;
-  top: 0;
-  left: 0;
+  // inset: 0;
   z-index: 101;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
   // padding-top: 4rem;
   // background-color: rgba(0, 0, 0, 0.7);
