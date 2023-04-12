@@ -8,8 +8,8 @@ const { isLoading, invoicesLoaded, invoiceDialog, searchQuery, filterQuery, filt
   storeToRefs(store);
 
 // const invoices = computed(() => invoiceData.value);
-const { invoices, getInvoices } = await useInvoices();
-await getInvoices();
+const { invoices } = await useInvoices();
+// await getInvoices();
 invoicesLoaded.value = true;
 
 const filterMenu = ref(true);
