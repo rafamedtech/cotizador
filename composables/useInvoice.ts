@@ -75,6 +75,7 @@ export const useInvoice = async (id?: string) => {
 
   return {
     currentInvoice,
+    getCurrentInvoice,
     newInvoice,
     deleteInvoiceOnDb,
     updateInvoiceOnDb,

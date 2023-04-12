@@ -9,10 +9,11 @@ const { params } = useRoute();
 const store = useStore();
 
 const { id }: any = params;
-const { currentInvoice } = await useInvoice(id);
+const { currentInvoice, getCurrentInvoice } = await useInvoice(id);
+await getCurrentInvoice(id);
 const invoiceItemList = currentInvoice.value?.invoiceItem;
 
-const { editCurrentInvoice, toggleInvoice, getInvoices } = store;
+const { editCurrentInvoice, toggleInvoice } = store;
 const user = useSupabaseUser();
 
 // setCurrentInvoice(params.id.toString());
@@ -116,21 +117,21 @@ async function changeStatus(status: string) {
 const invoiceBtn = ref<HTMLInputElement | null>(null);
 
 definePageMeta({
-  middleware: async function ({ params }, from) {
-    const { id }: any = params;
-    const { currentInvoice } = await useInvoice(id);
-    const { getInvoices } = await useInvoices();
-    await getInvoices();
+  // middleware: async function ({ params }, from) {
+  //   const { id }: any = params;
+  //   const { currentInvoice } = await useInvoice(id);
+  //   const { getInvoices } = await useInvoices();
+  //   await getInvoices();
 
-    if (!currentInvoice) {
-      return abortNavigation(
-        createError({
-          statusCode: 404,
-          message: 'No se encontro la cotizacion',
-        })
-      );
-    }
-  },
+  //   if (!currentInvoice) {
+  //     return abortNavigation(
+  //       createError({
+  //         statusCode: 404,
+  //         message: 'No se encontro la cotizacion',
+  //       })
+  //     );
+  //   }
+  // },
   pageTransition: {
     name: 'slide',
     mode: 'out-in',
