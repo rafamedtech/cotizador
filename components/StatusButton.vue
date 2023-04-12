@@ -36,12 +36,12 @@ const iconName = computed((): string => {
     <button
       type="button"
       @click="openModal"
-      class="input w-40"
+      class="flex w-32 items-center justify-center gap-1 rounded-xl p-2 text-white"
       :class="{
         'bg-orange-500  dark:bg-orange-500/50': status === 'Pendiente',
         'bg-green-500  dark:bg-green-500/50': status === 'Vendida',
         'bg-red-500  dark:bg-red-500/50': status === 'Cancelada',
-        'bg-gray-300  dark:bg-gray-600': status === 'Borrador',
+        'bg-gray-400  dark:bg-gray-600': status === 'Borrador',
       }"
     >
       <Icon :name="iconName" class="text-base" />

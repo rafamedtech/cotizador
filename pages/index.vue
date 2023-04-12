@@ -3,16 +3,14 @@
 import noResults from '@/assets/images/no-results.svg';
 
 const store = useStore();
-// const { toggleInvoice } = store;
-const { isLoading, invoicesLoaded, searchQuery, filterQuery, filterResults } = storeToRefs(store);
+const { isLoading, isLoadingFull, invoicesLoaded, searchQuery, filterQuery, filterResults } =
+  storeToRefs(store);
 
 const { invoices } = await useInvoices();
-
-invoicesLoaded.value = true;
-
 const filterMenu = ref(true);
 const filteredInvoices = ref([]);
 
+invoicesLoaded.value = true;
 filteredInvoices.value = invoices.value;
 
 onMounted(() => {
@@ -25,7 +23,12 @@ onMounted(() => {
   }
 });
 
+onBeforeUnmount(() => {
+  isLoadingFull.value = true;
+});
+
 const searchSubmit = ref(false);
+const filterStatus = ref('Todas');
 function searchInvoices() {
   searchSubmit.value = true;
   filterMenu.value = false;
@@ -96,18 +99,6 @@ const newInvoice = () => {
 //     }
 //   }, 1000);
 // }
-
-const filterStatus = ref('Todas');
-
-// const contacts = computed(() => {
-//   return invoices.value.map((invoice) => ({
-//     clientCompany: invoice.clientCompany,
-//     clientName: invoice.clientName,
-//     clientName2: invoice.clientName2,
-//     clientEmail: invoice.clientEmail,
-//     clientEmail2: invoice.clientEmail2,
-//   }));
-// });
 
 definePageMeta({
   middleware: ['auth'],

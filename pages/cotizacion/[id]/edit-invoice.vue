@@ -14,9 +14,9 @@ isLoading.value = false;
 const { params } = useRoute();
 const { id } = params;
 
-const { invoices } = await useInvoices();
+// const { invoices } = await useInvoices();
 const { currentInvoice } = await useInvoice(id);
-const { contactData } = await useContact();
+const { contactData } = storeToRefs(store);
 
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 

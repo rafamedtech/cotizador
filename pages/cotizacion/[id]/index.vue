@@ -1,22 +1,23 @@
 <script lang="ts" setup>
 // Imports
 // import emailjs from "@emailjs/browser";
-import type { InvoiceWithItems } from '@/types/invoice';
-import { RemovableRef } from '@vueuse/shared';
+// import type { InvoiceWithItems } from '@/types/invoice';
 
 // Definitions
 const { params } = useRoute();
 const store = useStore();
 
 const { id }: any = params;
-const { currentInvoice } = await useInvoice(id);
-// await getCurrentInvoice(id);
+const { currentInvoice, updateStatusOnDb } = await useInvoice(id);
 const invoiceItemList = currentInvoice.value?.invoiceItem;
 
-const { editCurrentInvoice, toggleInvoice } = store;
+const { editCurrentInvoice } = store;
+const { isLoadingFull } = storeToRefs(store);
 const user = useSupabaseUser();
 
-// setCurrentInvoice(params.id.toString());
+setTimeout(() => {
+  isLoadingFull.value = false;
+}, 1000);
 
 const toggleEditInvoice = () => {
   editCurrentInvoice();
@@ -112,6 +113,7 @@ async function changeStatus(status: string) {
 
   statusModal.value = false;
   // await changeInvoiceStatus(currentInvoice.value?.invoiceId, status);
+  await updateStatusOnDb(currentInvoice.value);
 }
 
 const invoiceBtn = ref<HTMLInputElement | null>(null);
@@ -154,23 +156,6 @@ definePageMeta({
             <span class="label-text text-dark-strong dark:text-light-medium">Etapa</span>
           </label>
           <StatusButton :status="currentInvoice.status" @@modal="changeStatusModal" />
-          <!-- <div class="form-control relative flex w-full flex-row">
-            <label ref="invoiceBtn" for="my-modal-3" class="hidden"> </label>
-            <button
-              type="button"
-              @click="changeStatusModal"
-              class="status-button input"
-              :class="{
-                draft: currentInvoice.status === 'Borrador',
-                pending: currentInvoice.status === 'Pendiente',
-                paid: currentInvoice.status === 'Vendida',
-                canceled: currentInvoice.status === 'Cancelada',
-              }"
-            >
-              <Icon :name="iconName" class="text-base" />
-              {{ currentInvoice.status }}
-            </button>
-          </div> -->
           <div class="w-full">
             <ul
               v-if="statusModal"

@@ -34,6 +34,7 @@ const filterContacts = () => {
 
 function setContact(contact) {
   searchQuery.value = contact;
+  contactsModal.value = false;
 }
 
 onMounted(() => {

@@ -59,6 +59,19 @@ export const useInvoice = async (id?: string) => {
       - Create composable
   */
 
+  async function updateStatusOnDb(invoice: InvoiceWithItems | null) {
+    try {
+      await $fetch(`/api/cotizacion/${invoice?.id}/status`, {
+        method: 'PUT',
+        body: {
+          invoice,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // - Delete currentInvoice
   async function deleteInvoiceOnDb(id: number) {
     try {
@@ -79,5 +92,6 @@ export const useInvoice = async (id?: string) => {
     newInvoice,
     deleteInvoiceOnDb,
     updateInvoiceOnDb,
+    updateStatusOnDb,
   };
 };

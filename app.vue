@@ -1,5 +1,5 @@
 <script setup>
-const { modalActive, customModal } = storeToRefs(useStore());
+const { modalActive, customModal, isLoadingFull } = storeToRefs(useStore());
 </script>
 
 <template>
@@ -15,7 +15,9 @@ const { modalActive, customModal } = storeToRefs(useStore());
       </div>
     </NuxtLayout>
 
-    <!-- <NewInvoice /> -->
+    <div class="absolute inset-0 h-screen w-screen transition-all" v-if="isLoadingFull">
+      <ScreenLoader />
+    </div>
   </main>
 </template>
 

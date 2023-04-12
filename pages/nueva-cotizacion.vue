@@ -4,19 +4,30 @@ import { required, email, maxLength, minValue, helpers } from '@vuelidate/valida
 
 // Definitions
 const store = useStore();
-const { isLoading, invoiceDialog, invoicesLoaded, editInvoice, filterResults, filteredInvoices } =
-  storeToRefs(store);
+const {
+  isLoading,
+  isLoadingFull,
+  invoiceDialog,
+  invoicesLoaded,
+  editInvoice,
+  filterResults,
+  filteredInvoices,
+} = storeToRefs(store);
 
 const { editCurrentInvoice, toggleModal, toggleInvoice, uploadToSupabase } = store;
 
 isLoading.value = false;
+
+setTimeout(() => {
+  isLoadingFull.value = false;
+}, 1000);
 
 const { params } = useRoute();
 const { id } = params;
 
 const { invoices } = await useInvoices();
 // const currentInvoice = ref(null);
-const { contactData } = await useContact();
+const { contactData } = storeToRefs(store);
 
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
@@ -282,7 +293,7 @@ const submitForm = async () => {
     uploadInvoice();
   } else {
     // modal.value.scrollTop = 0;
-    window.scrollY = 0;
+    // window.scrollY = 0;
     isLoading.value = false;
   }
 };
