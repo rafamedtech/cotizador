@@ -4,8 +4,14 @@ import { required, email, minLength, helpers } from '@vuelidate/validators';
 
 const user = useSupabaseUser();
 const { userLogin } = useAuthStore();
+const store = useStore();
+const { isLoadingFull } = storeToRefs(store);
 
 const isLoading = ref(false);
+
+setTimeout(() => {
+  isLoadingFull.value = false;
+}, 1000);
 
 const formData = reactive({
   email: '',
