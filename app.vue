@@ -1,15 +1,5 @@
 <script setup>
-// Dependencies imports
-// import { useStore } from '@/stores/main';
-// import { storeToRefs } from 'pinia';
-
-// Definitions
 const { modalActive, customModal } = storeToRefs(useStore());
-// const { getInvoices } = await useInvoices();
-
-// await getInvoices();
-
-// fetchUser();
 </script>
 
 <template>
