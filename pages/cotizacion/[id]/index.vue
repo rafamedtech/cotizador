@@ -123,7 +123,7 @@ definePageMeta({
 
     await getCurrentInvoice(id);
 
-    if (!currentInvoice) {
+    if (!currentInvoice.value) {
       return abortNavigation(
         createError({
           statusCode: 404,
