@@ -9,8 +9,8 @@ const { params } = useRoute();
 const store = useStore();
 
 const { id }: any = params;
-const { currentInvoice, getCurrentInvoice } = await useInvoice(id);
-await getCurrentInvoice(id);
+const { currentInvoice } = await useInvoice(id);
+// await getCurrentInvoice(id);
 const invoiceItemList = currentInvoice.value?.invoiceItem;
 
 const { editCurrentInvoice, toggleInvoice } = store;
