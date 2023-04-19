@@ -9,12 +9,12 @@ export default defineEventHandler(async (event) => {
 
   return prisma.invoice.create({
     include: {
-      invoiceItem: true,
+      invoiceItems: true,
     },
     data: {
       ...invoice,
-      invoiceItem: {
-        create: [...invoice.invoiceItem],
+      invoiceItems: {
+        create: invoice.invoiceItems,
       },
     },
   });

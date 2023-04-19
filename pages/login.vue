@@ -5,7 +5,8 @@ import { required, email, minLength, helpers } from '@vuelidate/validators';
 const user = useSupabaseUser();
 const { userLogin } = useAuthStore();
 
-const isLoading = ref(false);
+const store = useStore();
+const { isLoading } = storeToRefs(store);
 
 const formData = reactive({
   email: '',
@@ -66,7 +67,7 @@ definePageMeta({
       </figure>
       <form
         @submit.prevent="submitForm"
-        class="bg-opacity-50 mt-10 flex w-full flex-col rounded-[20px] bg-white p-8 shadow-lg dark:bg-dark-strong md:mt-0 md:w-1/2 lg:w-2/6"
+        class="bg-opacity-50 mt-10 flex w-full flex-col rounded-[20px] bg-white p-8 shadow-pinterest dark:bg-dark-strong md:mt-0 md:w-1/2 lg:w-2/6"
       >
         <h2
           class="mb-5 w-fit border-b-2 border-primary text-lg font-medium text-dark-medium dark:border-primary/50 dark:text-light-strong"
@@ -74,14 +75,15 @@ definePageMeta({
           Iniciar sesión
         </h2>
         <div class="relative mb-4">
-          <label for="full-name" class="text-sm leading-7 text-gray-400">Email</label>
+          <label for="full-name" class="text-xs leading-7 text-gray-400">Email</label>
           <div class="relative">
             <input
               v-model="formData.email"
               type="text"
               id="email"
               name="email"
-              class="bg-opacity-20 input-primary input w-full rounded border-none bg-light-medium py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
+              placeholder="Ej. correo@ejemplo.com"
+              class="input-primary input w-full py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
               :class="{
                 ' border border-red-500 focus:border-red-500': v$.email.$error,
                 'border border-[#42d392] ': !v$.email.$invalid,
@@ -104,15 +106,16 @@ definePageMeta({
             v$.email.$errors[0].$message
           }}</span>
         </div>
+
         <div class="relative mb-4">
-          <label for="password" class="text-sm leading-7 text-gray-400">Contraseña</label>
+          <label for="password" class="text-xs leading-7 text-gray-400">Contraseña</label>
           <div class="relative">
             <input
               id="password"
               v-model="formData.password"
               name="password"
               type="password"
-              class="bg-opacity-20 input-primary input w-full rounded border-none bg-light-medium py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
+              class="input-primary input w-full py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
               :class="{
                 ' border-red-500 focus:border-red-500': v$.password.$error,
                 'border-[#42d392]': !v$.password.$invalid,
@@ -134,8 +137,21 @@ definePageMeta({
             v$.password.$errors[0].$message
           }}</span>
         </div>
+
+        <!-- <BaseInput label="Email" @change="v$.email.$touch" v-model="formData.email">
+          <span class="text-xs text-red-500" v-if="v$.email.$error">{{
+            v$.email.$errors[0].$message
+          }}</span>
+        </BaseInput>
+
+        <BaseInput label="Contraseña" v-model="formData.password">
+          <span class="text-xs text-red-500" v-if="v$.password.$error">{{
+            v$.password.$errors[0].$message
+          }}</span>
+        </BaseInput> -->
+
         <button
-          class="rounded border-0 bg-primary py-2 px-8 font-sans font-bold text-white hover:bg-secondary focus:outline-white"
+          class="btn rounded-lg border-0 bg-primary py-2 px-8 font-sans font-bold text-white hover:bg-secondary focus:outline-white"
         >
           <span v-if="!isLoading">Enviar</span>
           <LoadingSpinner v-else />

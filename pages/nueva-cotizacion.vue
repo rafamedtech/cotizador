@@ -1,139 +1,65 @@
-<script setup>
+<script lang="ts" setup>
+// Dependecy imports
 import useVuelidate from '@vuelidate/core';
 import { required, email, maxLength, minValue, helpers } from '@vuelidate/validators';
+import VueDatepickerUi from 'vue-datepicker-ui';
+import colors from 'tailwindcss/colors';
+import 'vue-datepicker-ui/lib/vuedatepickerui.css';
+
+// Type imports
+import type Contact from '@/types/contact';
+import type { InvoiceDraft } from '@/types/invoice';
+import { Modal } from '@/types/modal';
 
 // Definitions
 const store = useStore();
-const {
-  isLoading,
-  isLoadingFull,
-  invoiceDialog,
-  invoicesLoaded,
-  editInvoice,
-  filterResults,
-  filteredInvoices,
-} = storeToRefs(store);
+const { isLoading, invoicesLoaded, editInvoice, filterResults } = storeToRefs(store);
 
-const { editCurrentInvoice, toggleModal, toggleInvoice, uploadToSupabase } = store;
+const backBtn = ref<HTMLElement | null>(null);
+const { editCurrentInvoice, toggleInvoice } = store;
 
-isLoading.value = false;
+function toggleModal() {
+  const html = document.querySelector('html');
+  if (html) html.style.overflowY = 'hidden';
+  backBtn.value?.click();
+}
 
-// onBeforeMount(() => {
-//   isLoadingFull.value = false;
-// });
-// setTimeout(() => {
-// }, 1000);
+function discardInvoice() {
+  store.$patch({
+    modalType: Modal.Discard,
+  });
+  backBtn.value?.click();
+}
 
-const { params } = useRoute();
-const { id } = params;
+const errorBorder = computed(() => (v$.value.date.$error ? colors.red[500] : colors.gray[300]));
 
 const { invoices } = await useInvoices();
-// const currentInvoice = ref(null);
 const { contactData } = storeToRefs(store);
 
-const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
 const modal = ref(null);
 const statusModal = ref(false);
 
-const invoiceObject = reactive({
-  invId: invoices.value.length + 1,
+const invoiceObject = reactive<InvoiceDraft>({
+  invId: (invoices.value.length + 1).toString(),
   clientCompany: '',
-  clientName: null,
-  clientName2: null,
-  clientEmail: null,
-  clientEmail2: null,
+  clientName: '',
+  clientName2: '',
+  clientEmail: '',
+  clientEmail2: '',
   currencyType: 'MX',
   exchangeCost: 0,
   eta: 'Inmediata',
   notes: '',
-  invoiceDate: null,
-  invoiceDateUnix: null,
-  paymentTerms: 0,
-  paymentDueDate: null,
-  paymentDueDateUnix: null,
+  invoiceDate: new Date(),
+  paymentDueDate: '',
   condition: '',
   paymentType: '',
   featureType: 'texto',
   invoiceItem: [{ itemName: '', qty: 1, partNo: '', price: 0, total: 0 }],
   status: 'Borrador',
 });
-
-// Contacts autocomplete
-
-const uniqueContacts = ref(
-  Array.from(new Set(contactData.value.map((a) => a.clientCompany))).map((clientCompany) => {
-    return contactData.value.find((a) => a.clientCompany === clientCompany);
-  })
-);
-
-const filteredContacts = ref([]);
-const contactsModal = ref(false);
-
-const filterContacts = () => {
-  if (invoiceObject.clientCompany.length === 0) {
-    filteredContacts.value = uniqueContacts.value;
-  }
-
-  filteredContacts.value = uniqueContacts.value.filter((contact) => {
-    return contact.clientCompany
-      .toLowerCase()
-      .startsWith(invoiceObject.clientCompany.toLowerCase());
-  });
-};
-
-onMounted(() => {
-  filterContacts();
-});
-
-const setContact = (contact) => {
-  invoiceObject.clientCompany = contact.clientCompany;
-  invoiceObject.clientName = contact.clientName;
-  invoiceObject.clientEmail = contact.clientEmail;
-  contactsModal.value = false;
-};
-
-function clearSearch() {
-  invoiceObject.clientCompany = '';
-  invoiceObject.clientName = '';
-  invoiceObject.clientEmail = '';
-  invoiceObject.clientName2 = '';
-  invoiceObject.clientEmail2 = '';
-}
-
-const closeBtn = ref(null);
-
-function changeStatusModal() {
-  statusModal.value = true;
-}
-
-function changeStatus(status) {
-  invoiceObject.status = status;
-  statusModal.value = false;
-}
-
-// Invoice processing
-
-const rules = computed(() => {
-  return {
-    clientCompany: { required: helpers.withMessage('Este campo es obligatorio', required) },
-    clientName: { required: helpers.withMessage('Este campo es obligatorio', required) },
-    clientEmail: {
-      required: helpers.withMessage('Este campo es obligatorio', required),
-      email: helpers.withMessage('Formato inválido', email),
-    },
-    clientEmail2: {
-      email: helpers.withMessage('Formato inválido', email),
-    },
-    paymentTerms: { minValue: helpers.withMessage('Este campo es obligatorio', minValue(1)) },
-    paymentType: { required: helpers.withMessage('Este campo es obligatorio', required) },
-    condition: { required: helpers.withMessage('Este campo es obligatorio', required) },
-    notes: {
-      maxLength: helpers.withMessage('Solo se permite hasta 255 caracteres', maxLength(255)),
-    },
-  };
-});
-const v$ = useVuelidate(rules, invoiceObject);
 
 // Totals processing
 
@@ -153,23 +79,101 @@ const invoiceTotal = computed(() => {
   return invoiceSubtotal.value + invoiceTax.value;
 });
 
+// Contacts autocomplete
+
+const uniqueContacts = ref(
+  Array.from(new Set(contactData.value.map((a) => a.clientCompany))).map((clientCompany) => {
+    return contactData.value.find((a) => a.clientCompany === clientCompany);
+  })
+);
+
+const filteredContacts = ref<Contact[]>([]);
+const contactsModal = ref(false);
+
+const filterContacts = () => {
+  if (invoiceObject.clientCompany.length === 0) {
+    filteredContacts.value = uniqueContacts.value as Contact[];
+  }
+
+  filteredContacts.value = uniqueContacts.value.filter((contact) => {
+    return contact?.clientCompany
+      .toLowerCase()
+      .startsWith(invoiceObject.clientCompany.toLowerCase());
+  }) as Contact[];
+};
+
+onMounted(() => {
+  filterContacts();
+});
+
+const setContact = (contact: Contact) => {
+  invoiceObject.clientCompany = contact.clientCompany;
+  invoiceObject.clientName = contact.clientName;
+  invoiceObject.clientEmail = contact.clientEmail;
+  contactsModal.value = false;
+};
+
+function clearSearch() {
+  invoiceObject.clientCompany = '';
+  invoiceObject.clientName = '';
+  invoiceObject.clientEmail = '';
+  invoiceObject.clientName2 = '';
+  invoiceObject.clientEmail2 = '';
+}
+
+// const closeBtn = ref(null);
+
+function changeStatusModal() {
+  statusModal.value = true;
+}
+
+function changeStatus(status: string) {
+  invoiceObject.status = status;
+  statusModal.value = false;
+}
+
+// Invoice processing
+
+const rules = computed(() => {
+  return {
+    date: {
+      required: helpers.withMessage('Es necesario ingresar una fecha', required),
+      minValue: helpers.withMessage('La fecha es inválida', minValue(Date.now())),
+    },
+    clientCompany: { required: helpers.withMessage('Este campo es obligatorio', required) },
+    clientName: { required: helpers.withMessage('Este campo es obligatorio', required) },
+    clientEmail: {
+      required: helpers.withMessage('Este campo es obligatorio', required),
+      email: helpers.withMessage('Formato inválido', email),
+    },
+    clientEmail2: {
+      email: helpers.withMessage('Formato inválido', email),
+    },
+    paymentTerms: { minValue: helpers.withMessage('Este campo es obligatorio', minValue(1)) },
+    paymentType: { required: helpers.withMessage('Este campo es obligatorio', required) },
+    condition: { required: helpers.withMessage('Este campo es obligatorio', required) },
+    notes: {
+      maxLength: helpers.withMessage('Solo se permite hasta 255 caracteres', maxLength(255)),
+    },
+  };
+});
+const v$ = useVuelidate(rules, invoiceObject as any);
+
 function clearInvoice() {
   invoiceObject.status = 'Borrador';
   invoiceObject.clientCompany = '';
-  invoiceObject.clientName = null;
-  invoiceObject.clientName2 = null;
-  invoiceObject.clientEmail = null;
-  invoiceObject.clientEmail2 = null;
+  invoiceObject.clientName = '';
+  invoiceObject.clientName2 = '';
+  invoiceObject.clientEmail = '';
+  invoiceObject.clientEmail2 = '';
   invoiceObject.currencyType = 'MX';
   invoiceObject.exchangeCost = 0;
   invoiceObject.eta = 'Inmediata';
   invoiceObject.notes = '';
-  invoiceObject.paymentTerms = 0;
-  invoiceObject.paymentDueDate = null;
+  invoiceObject.paymentDueDate = '';
   invoiceObject.condition = '';
   invoiceObject.paymentType = '';
   invoiceObject.featureType = 'texto';
-  // invoiceObject.features = { text: '', image: null };
   invoiceObject.invoiceItem = [{ itemName: '', qty: 1, partNo: '', price: 0, total: 0 }];
   isLoading.value = false;
 }
@@ -179,23 +183,6 @@ const closeInvoice = () => {
   // if (editInvoice.value) {
   //   editCurrentInvoice();
   // }
-};
-
-const deleteInvoiceItem = (id) => {
-  if (invoiceObject.invoiceItem.length === 1) {
-    return;
-  }
-  invoiceObject.invoiceItem = invoiceObject.invoiceItem.filter((item) => item.id !== id);
-};
-
-const addNewInvoiceItem = () => {
-  invoiceObject.invoiceItem.push({
-    itemName: '',
-    qty: 1,
-    partNo: '',
-    price: 0,
-    total: 0,
-  });
 };
 
 //// Get image from input
@@ -225,8 +212,6 @@ const uploadInvoice = async () => {
   await newInvoice({
     ...invoiceObject,
     invId: invoiceObject.invId.toString(),
-    invoiceDateUnix: invoiceObject.invoiceDateUnix.toString(),
-    paymentDueDateUnix: invoiceObject.paymentDueDateUnix.toString(),
     invoiceSubtotal: invoiceSubtotal.value,
     invoiceTax: invoiceTax.value,
     invoiceTotal: invoiceTotal.value,
@@ -242,46 +227,46 @@ const uploadInvoice = async () => {
 
   setTimeout(() => {
     filterResults.value = true;
-    modal.value.scrollTop = 0;
+    // modal.value?.scrollTop = 0;
     clearInvoice();
 
     isLoading.value = false;
     invoicesLoaded.value = true;
 
-    closeBtn.value.click();
+    // closeBtn.value?.click();
 
     closeInvoice();
 
-    const html = document.querySelector('html');
-    html.style.overflowY = 'scroll';
+    const html: HTMLHtmlElement | null = document.querySelector('html');
+    html ? (html.style.overflowY = 'scroll') : null;
   }, 1000);
 };
 
 const updateInvoice = async () => {
   isLoading.value = true;
 
-  await newInvoice({
-    ...invoiceObject,
-    invId: invoiceObject.invId.toString(),
-    invoiceDateUnix: invoiceObject.invoiceDateUnix.toString(),
-    paymentDueDateUnix: invoiceObject.paymentDueDateUnix.toString(),
-    invoiceSubtotal: invoiceSubtotal.value,
-    invoiceTax: invoiceTax.value,
-    invoiceTotal: invoiceTotal.value,
-  });
+  // await newInvoice({
+  //   ...invoiceObject,
+  //   invId: invoiceObject.invId.toString(),
+  //   invoiceDateUnix: invoiceObject.invoiceDateUnix.toString(),
+  //   paymentDueDateUnix: invoiceObject.paymentDueDateUnix.toString(),
+  //   invoiceSubtotal: invoiceSubtotal.value,
+  //   invoiceTax: invoiceTax.value,
+  //   invoiceTotal: invoiceTotal.value,
+  // });
 
   setTimeout(() => {
-    modal.value.scrollTop = 0;
+    // modal.value?.scrollTop = 0;
     clearInvoice();
 
     isLoading.value = false;
     invoicesLoaded.value = true;
 
-    closeBtn.value.click();
+    // closeBtn.value.click();
 
     closeInvoice();
-    const html = document.querySelector('html');
-    html.style.overflowY = 'scroll';
+    // const html = document.querySelector('html');
+    // html.style.overflowY = 'scroll';
   }, 1000);
 };
 
@@ -300,55 +285,30 @@ const submitForm = async () => {
   }
 };
 
-if (!editInvoice.value) {
-  invoiceObject.invoiceDateUnix = Date.now();
-  invoiceObject.invoiceDate = new Date(invoiceObject.invoiceDateUnix).toLocaleDateString(
-    'es-mx',
-    dateOptions
-  );
-}
+// if (!editInvoice.value) {
+//   invoiceObject.invoiceDateUnix = Date.now();
+//   invoiceObject.invoiceDate = new Date(invoiceObject.invoiceDateUnix).toLocaleDateString(
+//     'es-mx',
+//     dateOptions
+//   );
+// }
 
-// watch(editInvoice, async () => {
-//   currentInvoice.value = await useInvoice(id);
-//   isLoading.value = false;
-//   invoiceObject.clientCompany = currentInvoice.value.clientCompany;
-//   invoiceObject.clientName = currentInvoice.value.clientName;
-//   invoiceObject.clientName2 = currentInvoice.value.clientName2;
-//   invoiceObject.clientEmail = currentInvoice.value.clientEmail;
-//   invoiceObject.clientEmail2 = currentInvoice.value.clientEmail2;
-//   invoiceObject.currencyType = currentInvoice.value.currencyType;
-//   invoiceObject.exchangeCost = currentInvoice.value.exchangeCost;
-//   invoiceObject.eta = currentInvoice.value.eta;
-//   invoiceObject.invoiceDateUnix = currentInvoice.value.invoiceDateUnix;
-//   invoiceObject.invoiceDate = currentInvoice.value.invoiceDate;
-//   invoiceObject.paymentTerms = currentInvoice.value.paymentTerms;
-//   invoiceObject.paymentDueDateUnix = currentInvoice.value.paymentDueDateUnix;
-//   invoiceObject.paymentDueDate = currentInvoice.value.paymentDueDate;
-//   invoiceObject.condition = currentInvoice.value.condition;
-//   invoiceObject.paymentType = currentInvoice.value.paymentType;
-//   invoiceObject.notes = currentInvoice.value.notes;
-//   invoiceObject.featureType = currentInvoice.value.featureType;
-//   invoiceObject.features = currentInvoice.value.features;
-//   invoiceObject.invoiceItem = currentInvoice.value.invoiceItem;
-//   invoiceObject.status = currentInvoice.value.status;
+// watch(invoiceDialog, () => {
+//   clearInvoice();
+//   v$.value.$reset();
+//   modal.value.scrollTop = 0;
 // });
 
-watch(invoiceDialog, () => {
-  clearInvoice();
-  v$.value.$reset();
-  modal.value.scrollTop = 0;
-});
-
-watchEffect(() => {
-  const futureDate = new Date();
-  invoiceObject.paymentDueDateUnix = futureDate.setDate(
-    futureDate.getDate() + parseInt(invoiceObject.paymentTerms)
-  );
-  invoiceObject.paymentDueDate = new Date(invoiceObject.paymentDueDateUnix).toLocaleDateString(
-    'es-MX',
-    dateOptions
-  );
-});
+// watchEffect(() => {
+//   const futureDate = new Date();
+//   invoiceObject.paymentDueDateUnix = futureDate.setDate(
+//     futureDate.getDate() + parseInt(invoiceObject.paymentTerms)
+//   ) as string;
+//   invoiceObject.paymentDueDate = new Date(invoiceObject.paymentDueDateUnix).toLocaleDateString(
+//     'es-MX',
+//     dateOptions
+//   );
+// });
 
 definePageMeta({
   middleware: ['auth'],
@@ -366,9 +326,10 @@ definePageMeta({
       <!-- <label ref="closeBtn" for="my-modal-3" class="hidden">✕</label> -->
       <button
         type="button"
-        @click="toggleModal"
+        @click="discardInvoice"
         class="z-50 flex items-center gap-2 self-start text-light-medium"
       >
+        <label for="my-modal-6" class="hidden"></label>
         <Icon class="text-2xl text-primary" name="heroicons-solid:arrow-left" />
         <span class="text-xs text-dark-medium dark:text-light-strong">Regresar</span>
       </button>
@@ -427,7 +388,7 @@ definePageMeta({
                       <li
                         class="cursor-pointer text-dark-medium hover:text-primary dark:text-light-medium dark:hover:text-primary"
                         v-for="filteredContact in filteredContacts"
-                        :key="filteredContact.id"
+                        :key="filteredContact.clientCompany"
                       >
                         <button @click="setContact(filteredContact)">
                           {{ filteredContact.clientCompany }}
@@ -563,33 +524,42 @@ definePageMeta({
                 <div class="flex flex-col">
                   <label for="invoiceDate" class="dark:text-light-strong">Fecha</label>
                   <input
-                    class="input-primary input w-full rounded-xl border-none py-1 px-3 text-[12px] leading-8 text-dark-medium outline-none placeholder:italic disabled:bg-light-medium dark:bg-dark-medium dark:text-light-strong"
-                    disabled
+                    class="input w-full rounded-xl border-none py-1 px-3 text-[12px] leading-8 text-dark-medium outline-none placeholder:italic disabled:bg-light-medium dark:bg-dark-medium dark:text-light-strong"
                     type="text"
                     id="invoiceDate"
-                    v-model="invoiceObject.invoiceDate"
+                    disabled
+                    :value="invoiceObject.invoiceDate.toLocaleDateString('es-MX', dateOptions)"
                   />
                 </div>
                 <div class="form-control flex flex-col">
                   <label for="paymentDueDate" class="dark:text-light-strong"
-                    >Días de vigencia<span class="text-red-500">*</span></label
+                    >Fecha de vencimiento<span class="text-red-500">*</span></label
                   >
-                  <input
+                  <!-- <input
                     type="number"
                     id="paymentDueDate"
                     class="input-primary input w-full bg-light-medium"
                     v-model="invoiceObject.paymentTerms"
+                  /> -->
+
+                  <VueDatepickerUi
+                    v-model="invoiceObject.paymentDueDate"
+                    lang="es"
+                    placeholder="Selecciona una fecha"
+                    position="right"
                   />
+
+                  <!-- :class="{ 'border-red-500': v$.date.$error }" -->
                   <label class="label">
-                    <span class="label-text-alt text-red-500" v-if="v$.paymentTerms.$error">{{
-                      v$.paymentTerms.$errors[0].$message
+                    <span class="label-text-alt text-red-500" v-if="v$.date.$error">{{
+                      v$.date.$errors[0].$message
                     }}</span>
                   </label>
                 </div>
                 <div class="flex flex-col">
                   <label
                     for="paymentDueDate"
-                    class="mb-[6px] text-[10px] dark:text-light-strong lg:text-[12px]"
+                    class="text-[10px] dark:text-light-strong lg:text-[12px]"
                     data-label="entrega"
                     >Tiempo de entrega</label
                   >
@@ -627,7 +597,7 @@ definePageMeta({
                     :title="
                       invoiceObject.currencyType === 'MX'
                         ? 'Este campo se habilita cuando el tipo de moneda es USD'
-                        : null
+                        : ''
                     "
                   />
                 </div>
@@ -746,7 +716,7 @@ definePageMeta({
                           v-if="invoiceObject.invoiceItem.length > 1"
                         >
                           <Icon
-                            @click="deleteInvoiceItem(item.id)"
+                            @click=""
                             class="m-auto cursor-pointer text-base text-primary"
                             title="Borrar artículo"
                             name="icon-park-outline:delete"
@@ -759,7 +729,7 @@ definePageMeta({
                   <div class="divider"></div>
 
                   <section
-                    @click="addNewInvoiceItem"
+                    @click=""
                     class="btn mx-auto flex w-fit gap-2 border-none bg-primary text-white hover:bg-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
                   >
                     <i class="fa-solid fa-plus"></i>
@@ -846,12 +816,46 @@ definePageMeta({
   </main>
 </template>
 
-<style scoped>
+<style>
 ::-webkit-scrollbar-track {
   @apply my-2 rounded-xl;
 }
 
+.v-calendar .input-field svg.datepicker {
+  @apply fill-primary dark:fill-primary/50;
+}
+
+.v-calendar .calendar .selected-field,
+.v-calendar .content {
+  @apply dark:bg-dark-medium;
+}
+
+.v-calendar .calendar .days .day.selectedDate .number {
+  @apply bg-primary dark:bg-primary/50;
+}
+
+.v-calendar .calendar .days .day.name {
+  @apply text-primary dark:text-primary/50;
+}
+
 label {
   @apply mb-1 text-xs text-dark-medium dark:text-light-medium;
+}
+
+.v-calendar,
+.v-calendar .input-field {
+  min-width: 100%;
+}
+
+.v-calendar .input-field input {
+  /* @apply input-bordered input pl-10;  */
+  @apply input w-full bg-light-medium dark:bg-dark-medium;
+  border-color: v-bind(errorBorder);
+  padding-left: 2rem;
+  padding-right: 0;
+}
+
+input[type='time'] {
+  min-width: 100%;
 }
 </style>

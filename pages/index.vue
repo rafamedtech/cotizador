@@ -10,7 +10,7 @@ const { invoices } = await useInvoices();
 const filterMenu = ref(true);
 const filteredInvoices = ref([]);
 
-invoicesLoaded.value = true;
+// invoicesLoaded.value = true;
 filteredInvoices.value = invoices.value;
 
 onMounted(() => {
@@ -64,7 +64,7 @@ function searchCleared() {
 const invoiceBtn = ref(null);
 
 const newInvoice = () => {
-  return navigateTo('nueva-cotizacion');
+  return navigateTo('new-invoice');
 
   // const html = document.querySelector('html');
   // html.style.overflowY = 'hidden';
@@ -212,39 +212,20 @@ definePageMeta({
           <p class="w-[20%]">Total</p>
         </section>
 
-        <!-- <ClientOnly>
-          <TransitionGroup
-            tag="section"
-            v-if="invoicesLoaded && !filterResults"
-            class="flex flex-col items-center gap-4"
-            name="slide-up"
-            appear
-          >
-            <MyInvoice
-              v-for="(invoice, index) in invoices"
-              :style="{ transitionDelay: `${index * 100}ms` }"
-              :invoice="invoice"
-              :key="invoice.id"
-            />
-          </TransitionGroup>
-        </ClientOnly> -->
-
-        <ClientOnly>
-          <TransitionGroup
-            v-if="invoicesLoaded && filterResults"
-            tag="section"
-            class="flex flex-col items-center gap-10 lg:gap-4"
-            name="slide-up"
-            appear
-          >
-            <MyInvoice
-              v-for="(invoice, index) in filteredInvoices"
-              :style="{ transitionDelay: `${index * 100}ms` }"
-              :invoice="invoice"
-              :key="invoice.invId"
-            />
-          </TransitionGroup>
-        </ClientOnly>
+        <TransitionGroup
+          v-if="invoicesLoaded && filterResults"
+          tag="section"
+          class="flex flex-col items-center gap-10 lg:gap-4"
+          name="slide-up"
+          appear
+        >
+          <MyInvoice
+            v-for="(invoice, index) in filteredInvoices"
+            :style="{ transitionDelay: `${index * 100}ms` }"
+            :invoice="invoice"
+            :key="invoice.invId"
+          />
+        </TransitionGroup>
 
         <!-- No filter results -->
 

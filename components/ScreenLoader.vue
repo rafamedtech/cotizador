@@ -1,9 +1,11 @@
 <template>
-  <div class="relative h-full">
-    <div class="blur-background absolute inset-0"></div>
-    <div class="loading">
-      <div>
-        <span class="animate-spin"></span>
+  <div class="fixed inset-0 h-screen w-screen transition-all">
+    <div class="relative h-full">
+      <div class="blur-background absolute inset-0"></div>
+      <div class="loading">
+        <div>
+          <span class="animate-spin"></span>
+        </div>
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
       invId: id,
     },
     include: {
-      invoiceItem: true,
+      invoiceItems: true,
     },
   });
 

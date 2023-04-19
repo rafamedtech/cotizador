@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   const { id } = await readBody(event);
+  console.log(id);
 
   assertMethod(event, ['DELETE']);
 
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   const invoice = await prisma.invoice.delete({
     where: {
-      id: id,
+      id: id as number,
     },
   });
 

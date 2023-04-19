@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // Imports
-// import emailjs from "@emailjs/browser";
-// import type { InvoiceWithItems } from '@/types/invoice';
+import emailjs from '@emailjs/browser';
+import { Modal } from '@/types/modal';
 
 // Definitions
 const { params } = useRoute();
@@ -9,100 +9,86 @@ const store = useStore();
 
 const { id }: any = params;
 const { currentInvoice, updateStatusOnDb } = await useInvoice(id);
-const invoiceItemList = currentInvoice.value?.invoiceItem;
+const invoiceItemList = currentInvoice.value?.invoiceItems;
 
-const { editCurrentInvoice } = store;
-const { isLoadingFull } = storeToRefs(store);
+// const { editCurrentInvoice } = store;
+const { isLoading, isLoadingFull, backBtn, modalType } = storeToRefs(store);
 const user = useSupabaseUser();
 
 isLoadingFull.value = false;
-// setTimeout(() => {
-// }, 1000);
 
-const toggleEditInvoice = () => {
-  editCurrentInvoice();
-  invoiceBtn.value?.click();
-  const html = document.querySelector('html');
-  if (html) {
-    html.style.overflowY = 'hidden';
-  }
-};
+const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
-const deleteInvoice = () => {
-  store.$patch({
-    customModal: true,
-    modalType: 'delete',
-  });
-};
-
-const iconName = computed((): string => {
-  if (currentInvoice.value?.status === 'Vendida') {
-    return 'icon-park-outline:check-one';
-  }
-
-  if (currentInvoice.value?.status === 'Borrador') {
-    return 'ri:draft-line';
-  }
-
-  if (currentInvoice.value?.status === 'Pendiente') {
-    return 'icon-park-outline:caution';
-  }
-  if (currentInvoice.value?.status === 'Cancelada') {
-    return 'material-symbols:cancel-outline';
-  }
-
-  return '';
-});
-
-// const sendEmail = () => {
-//   emailjs
-//     .send(
-//       "service_tyiaa8g",
-//       "template_gw5kvf9",
-//       {
-//         customer_name: currentInvoice.value.clientName.split(" ")[0],
-//         customer_name2: currentInvoice.value.clientName2
-//           ? `/${currentInvoice.value.clientName2.split(" ")[0]}`
-//           : "",
-//         customer_email: currentInvoice.value.clientEmail,
-//         customer_email2: currentInvoice.value.clientEmail2,
-//         message: location.toString(),
-//       },
-//       "QyWKNAO42Ukv7v_0T"
-//     )
-//     .then(
-//       (result) => {
-//         console.log("SUCCESS!", result.text);
-//       },
-//       (error) => {
-//         console.log("FAILED...", error.text);
-//       }
-//     );
-
-//   setTimeout(() => {
-//     useStore().$patch({
-//       customModal: true,
-//       modalType: "email",
-//     });
-//     if (currentInvoice.value.invoiceDraft) {
-//       updateStatusToPending(currentInvoice.value.docId);
-//     }
-//   }, 1000);
+// const toggleEditInvoice = () => {
+//   editCurrentInvoice();
+//   invoiceBtn.value?.click();
+//   const html = document.querySelector('html');
+//   if (html) {
+//     html.style.overflowY = 'hidden';
+//   }
 // };
 
-const generatePDF = () => {
-  useStore().$patch({
-    customModal: true,
-    modalType: 'print',
-  });
-};
+// Modals
+
+// const modalBtn = ref<HTMLElement | null>(null);
+
+function toggleModal() {
+  const html: HTMLHtmlElement | null = document.querySelector('html');
+  if (html) html.style.overflowY = 'hidden';
+  backBtn.value?.click();
+}
+
+function deleteInvoice() {
+  store.$patch({ modalType: Modal.Delete });
+  toggleModal();
+}
+
+function generatePDF() {
+  store.$patch({ modalType: Modal.Pdf });
+  toggleModal();
+}
+
+async function sendEmail() {
+  // const { currentInvoice } = await useInvoice(id.toString());
+  isLoading.value = true;
+
+  try {
+    const response = await emailjs.send(
+      'service_iao05ok',
+      'template_u9jm6y3',
+      {
+        customer_name: currentInvoice.value?.clientName.split(' ')[0],
+        customer_name2: currentInvoice.value?.clientName2
+          ? `/${currentInvoice.value?.clientName2.split(' ')[0]}`
+          : '',
+        customer_email: currentInvoice.value?.clientEmail,
+        customer_email2: currentInvoice.value?.clientEmail2,
+        message: location.toString(),
+      },
+      'QyWKNAO42Ukv7v_0T'
+    );
+
+    console.log(response.status);
+
+    if (response.status !== 200) throw response;
+  } catch (error: any) {
+    console.error(error.text);
+  }
+  setTimeout(() => {
+    isLoading.value = false;
+    store.$patch({
+      modalType: Modal.Email,
+    });
+    toggleModal();
+  }, 1000);
+}
 
 const statusModal = ref(false);
+
 function changeStatusModal() {
   statusModal.value = true;
 }
 
-// const { changeInvoiceStatus } = useInvoice();
 async function changeStatus(status: string) {
   if (currentInvoice.value) {
     if (currentInvoice.value.status === status) {
@@ -112,7 +98,6 @@ async function changeStatus(status: string) {
   }
 
   statusModal.value = false;
-  // await changeInvoiceStatus(currentInvoice.value?.invoiceId, status);
   await updateStatusOnDb(currentInvoice.value);
 }
 
@@ -133,6 +118,7 @@ definePageMeta({
   //     );
   //   }
   // },
+
   pageTransition: {
     name: 'slide',
     mode: 'out-in',
@@ -144,22 +130,24 @@ definePageMeta({
   <main
     class="relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pt-2 pb-6 print:px-10 lg:px-10"
   >
-    <div v-if="currentInvoice" class="invoice-view my-container mb-4 print:hidden">
+    <div v-if="currentInvoice && user" class="invoice-view my-container mb-4 print:hidden">
       <NuxtLink class="nav-link flex gap-2" :to="{ name: 'index' }">
         <Icon class="text-2xl text-primary" name="heroicons-solid:arrow-left" />
         <span class="text-dark-medium dark:text-light-strong">Regresar</span>
       </NuxtLink>
       <!-- Header -->
-      <div class="header flex flex-col gap-4 bg-white shadow-lg dark:bg-dark-strong lg:flex-row">
+      <div
+        class="header flex flex-col gap-4 rounded-lg bg-white shadow-pinterest dark:bg-dark-strong lg:flex-row"
+      >
         <div class="dropdown-bottom dropdown form-control relative mb-4 h-full w-1/2 items-end">
-          <label class="label w-full text-left">
+          <label class="label w-full text-center">
             <span class="label-text text-dark-strong dark:text-light-medium">Etapa</span>
           </label>
           <StatusButton :status="currentInvoice.status" @@modal="changeStatusModal" />
           <div class="w-full">
             <ul
               v-if="statusModal"
-              class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-[10px] bg-white p-2 shadow-lg transition-all dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong"
+              class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-lg border-light-strong bg-white shadow-lg transition-all dark:border dark:border-dark-strong dark:bg-dark-strong dark:text-light-strong"
             >
               <li
                 v-if="currentInvoice.status === 'Borrador'"
@@ -195,8 +183,8 @@ definePageMeta({
         <div class="right flex items-center justify-center gap-3">
           <NuxtLink
             v-if="currentInvoice.status === 'Borrador' || currentInvoice.status === 'Pendiente'"
-            :to="`/cotizacion/${currentInvoice.invId}/edit-invoice`"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-[#f2f2f2] p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium lg:text-[10px]"
+            :to="`/cotizacion/${currentInvoice.invId}/editar`"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
           >
             <!-- @click="toggleEditInvoice" -->
             <Icon
@@ -205,9 +193,10 @@ definePageMeta({
             />
             <span class="text-dark-medium dark:text-light-strong">Editar</span>
           </NuxtLink>
+          <label ref="backBtn" for="my-modal-6" class="hidden"></label>
           <button
             @click="deleteInvoice"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-[#f2f2f2] p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
           >
             <Icon class="text-xl text-primary" name="icon-park-outline:delete" />
 
@@ -216,16 +205,20 @@ definePageMeta({
 
           <button
             @click="generatePDF"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
           >
             <Icon name="icon-park-outline:doc-detail" class="text-xl" />
             PDF
           </button>
           <button
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-[10px] border-none bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            @click="sendEmail"
           >
+            <!-- <LoadingSpinner v-if="isLoading && modalType === Modal.Email" /> -->
             <Icon name="icon-park-outline:envelope-one" class="text-xl text-blue-500" />
             Enviar
+            <!-- <div v-else>
+            </div> -->
           </button>
         </div>
       </div>
@@ -261,7 +254,9 @@ definePageMeta({
 
     <!-- Invoice body -->
     <div id="pdf-content" class="w-full">
-      <section class="rounded-[20px] bg-white pt-4 shadow-lg dark:bg-dark-strong">
+      <section
+        class="rounded-[0.75rem] bg-white pt-4 shadow-pinterest dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
+      >
         <section class="relative flex h-full justify-between px-4 lg:px-8">
           <div class="mb-4 h-fit">
             <img
@@ -308,7 +303,12 @@ definePageMeta({
               Vigencia
             </p> -->
             <p class="dark:text-light text-[10px] text-dark-medium dark:text-light-strong">
-              {{ currentInvoice?.paymentDueDate }}
+              {{
+                new Date(currentInvoice?.paymentDueDate as Date).toLocaleDateString(
+                  'es-MX',
+                  dateOptions
+                )
+              }}
             </p>
 
             <h3 class="text-[9px] text-primary dark:text-primary/50 lg:text-base">
@@ -339,13 +339,13 @@ definePageMeta({
                 Nombre
               </h3>
               <p
-                class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[8px] capitalize text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
               >
                 <!-- Nombre -->
                 {{ currentInvoice?.clientName }}
               </p>
               <p
-                class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[8px] capitalize text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
               >
                 <!-- Nombre 2 -->
                 {{ currentInvoice?.clientName2 }}
@@ -410,29 +410,27 @@ definePageMeta({
 
       <!-- Items table -->
       <section
-        class="relative mt-4 max-h-[240px] min-h-[240px] overflow-x-auto rounded-[20px] bg-white shadow-lg dark:bg-dark-strong"
+        class="relative mt-4 max-h-[240px] min-h-[240px] overflow-x-auto rounded-[0.75rem] bg-white shadow-pinterest dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
       >
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
         >
           <!-- <h5 class="w-6 py-2 font-bold text-primary">ID</h5> -->
-          <h5
-            class="py-2 font-bold text-primary dark:text-primary/50 print:w-1/12 print:basis-1/12 lg:basis-[10%]"
-          >
-            # parte
-          </h5>
           <div class="w-72 print:w-7/12 lg:basis-5/12">
-            <h5 class="w-full py-2 text-center font-bold text-primary dark:text-primary/50">
-              Descripción
-            </h5>
+            <h5 class="w-full py-2 font-bold text-primary dark:text-primary/50">Descripción</h5>
           </div>
+          <h5
+            class="py-2 text-center font-bold text-primary dark:text-primary/50 print:w-1/12 print:basis-1/12 lg:basis-[10%]"
+          >
+            Condición
+          </h5>
           <h5
             class="py-2 text-center font-bold text-primary dark:text-primary/50 print:w-1/12 lg:basis-1/12"
           >
             Cantidad
           </h5>
           <h5
-            class="py-2 text-center font-bold text-primary dark:text-primary/50 print:w-2/12 lg:basis-3/12"
+            class="py-2 text-center font-bold text-primary dark:text-primary/50 print:basis-2/12 lg:basis-2/12"
           >
             Precio unitario
           </h5>
@@ -440,29 +438,26 @@ definePageMeta({
             Importe
           </h5>
         </div>
-        <!-- <div
-          class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
-        > -->
+
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
           v-for="(item, index) in invoiceItemList"
           :key="index"
         >
-          <!-- <p class="w-6 py-2">{{ item.id }}</p> -->
-          <p
-            class="py-2 text-dark-strong dark:text-light-strong print:w-1/12 print:basis-1/12 print:text-[8px] lg:basis-[10%]"
-          >
-            <!-- Numero de parte -->
-            {{ item.partNo }}
-          </p>
           <div class="w-72 print:w-7/12 lg:basis-5/12">
             <p
-              class="w-full py-2 text-left text-dark-strong dark:text-light-strong print:text-[8px]"
+              class="w-full overflow-x-hidden py-2 text-left text-dark-strong dark:text-light-strong print:text-[8px]"
             >
               <!-- Nombre del item -->
-              {{ item.itemName }}
+              {{ item.itemName || 'Articulo sin descripcion' }}
             </p>
           </div>
+          <p
+            class="py-2 text-center text-dark-strong dark:text-light-strong print:w-1/12 print:basis-1/12 print:text-[8px] lg:basis-[10%]"
+          >
+            <!-- Condicion -->
+            {{ item.condition }}
+          </p>
           <p
             class="py-2 text-center text-dark-strong dark:text-light-strong print:w-1/12 lg:basis-1/12"
           >
@@ -470,7 +465,7 @@ definePageMeta({
             {{ item.qty }}
           </p>
           <p
-            class="py-2 text-center text-dark-strong dark:text-light-strong print:w-2/12 lg:basis-3/12"
+            class="py-2 text-center text-dark-strong dark:text-light-strong print:basis-2/12 lg:basis-2/12"
           >
             {{
               new Intl.NumberFormat('es-MX', {
@@ -495,11 +490,11 @@ definePageMeta({
         class="flex w-full flex-col-reverse gap-4 overflow-y-hidden py-4 print:flex-row lg:flex-row"
       >
         <section
-          class="flex w-full flex-col gap-4 overflow-y-hidden rounded-[20px] bg-white px-6 py-4 shadow-lg dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:pr-0 lg:w-4/5 lg:flex-row"
+          class="flex w-full flex-col gap-4 overflow-y-hidden rounded-[0.75rem] bg-white px-6 py-4 shadow-pinterest dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:border print:border-light-strong print:pr-0 print:shadow-none lg:w-4/5 lg:flex-row"
         >
           <div class="overflow-y-hidden print:w-2/5 lg:w-1/2">
             <h3
-              class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong"
+              class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong print:text-xs"
             >
               Condiciones del servicio
             </h3>
@@ -512,9 +507,9 @@ definePageMeta({
               QUEDAMOS A SUS ORDENES PARA CUALQUIER DUDA O ACLARACION AL RESPECTO.
             </p>
           </div>
-          <div class="w-1/2">
+          <div class="w-1/2 print:w-2/5">
             <h3
-              class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong"
+              class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong print:text-xs"
             >
               Notas:
             </h3>
@@ -527,7 +522,7 @@ definePageMeta({
           </div>
         </section>
         <section
-          class="flex w-full basis-[30%] flex-col justify-center rounded-[20px] bg-white px-6 py-4 shadow-lg dark:bg-dark-strong print:basis-[30%] print:px-4 lg:w-1/5"
+          class="flex w-full basis-[30%] flex-col justify-center rounded-[0.75rem] bg-white px-6 py-4 shadow-pinterest dark:bg-dark-strong print:basis-[30%] print:border print:border-light-strong print:px-4 print:text-xs print:shadow-none lg:w-1/5"
         >
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
@@ -644,7 +639,7 @@ definePageMeta({
     <div class="pdf flex justify-center print:hidden" v-if="!user">
       <button
         @click="generatePDF"
-        class="mt-8 flex h-14 w-40 flex-row items-center justify-center gap-2 rounded-[10px] border-none bg-primary px-10 py-6 text-xs text-white transition-all hover:-translate-y-[1px] hover:shadow-lg dark:bg-primary/50"
+        class="mt-8 flex h-14 w-40 flex-row items-center justify-center gap-2 rounded-lg border border-light-strong bg-primary px-10 py-6 text-xs text-white transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-primary/50"
       >
         <i class="fa-solid fa-file-pdf text-lg"></i>
         Crear PDF
@@ -676,7 +671,7 @@ definePageMeta({
   .header,
   .invoice-details {
     // background-color: #fff;
-    border-radius: 20px;
+    border-radius: 0.75rem;
   }
 
   .header {

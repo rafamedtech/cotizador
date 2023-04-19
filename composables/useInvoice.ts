@@ -1,10 +1,11 @@
-import type { InvoiceOutline, InvoiceWithItems } from '@/types/invoice';
+import type { InvoiceWithItems, InvoiceDraft } from '@/types/invoice';
 
-// export default async (id: string) => useFetchWithCache<InvoiceWithItems>('/api/cotizacion/:id');
 export const useInvoice = async (id?: string) => {
-  // const currentInvoice = await useFetchWithCache<InvoiceWithItems>('/api/cotizacion/:id');
+  const store = useStore();
 
-  const currentInvoice = ref<InvoiceWithItems | null>(null);
+  const { openAlert, alertType, alertMsg, isLoading } = storeToRefs(store);
+
+  const currentInvoice = ref<InvoiceWithItems | null | undefined>(null);
   async function getCurrentInvoice(id: string) {
     const { data, error } = await useFetch<InvoiceWithItems>(`/api/cotizacion/${id}`);
 
@@ -23,7 +24,8 @@ export const useInvoice = async (id?: string) => {
   }
 
   // - Create new invoice
-  async function newInvoice(invoice: InvoiceWithItems) {
+  async function newInvoice(invoice: InvoiceDraft) {
+    isLoading.value = true;
     try {
       await $fetch(`/api/cotizacion/new`, {
         method: 'POST',
@@ -33,14 +35,32 @@ export const useInvoice = async (id?: string) => {
         },
       });
 
+      setTimeout(() => {
+        isLoading.value = false;
+        openAlert.value = true;
+        alertType.value = 'success';
+        alertMsg.value = 'La cotización ha sido creada!';
+      }, 1000);
+
+      setTimeout(() => {
+        openAlert.value = false;
+        alertType.value = '';
+        alertMsg.value = '';
+      }, 4000);
+
       await navigateTo('/');
     } catch (error) {
       console.error(error);
+      isLoading.value = false;
+      openAlert.value = true;
+      alertType.value = 'fail';
+      alertMsg.value = error as string;
     }
   }
 
   // - Edit currentInvoice
-  async function updateInvoiceOnDb(invoice: InvoiceWithItems) {
+  async function updateInvoiceOnDb(invoice: InvoiceDraft) {
+    isLoading.value = true;
     try {
       await $fetch('/api/cotizacion/:id/update', {
         method: 'PUT',
@@ -48,18 +68,30 @@ export const useInvoice = async (id?: string) => {
           invoice,
         },
       });
+
+      setTimeout(() => {
+        isLoading.value = false;
+        openAlert.value = true;
+        alertType.value = 'success';
+        alertMsg.value = 'La cotización ha sido actualizada!';
+      }, 1000);
+
+      setTimeout(() => {
+        openAlert.value = false;
+        alertType.value = '';
+        alertMsg.value = '';
+      }, 4000);
     } catch (error) {
       console.error(error);
+      isLoading.value = false;
+      openAlert.value = true;
+      alertType.value = 'fail';
+      alertMsg.value = error as string;
     }
   }
 
   // Update invoice status
-  /* TO-DO 
-      - Create server endpoint
-      - Create composable
-  */
-
-  async function updateStatusOnDb(invoice: InvoiceWithItems | null) {
+  async function updateStatusOnDb(invoice: InvoiceDraft | null | undefined) {
     try {
       await $fetch(`/api/cotizacion/${invoice?.id}/status`, {
         method: 'PUT',
@@ -67,22 +99,55 @@ export const useInvoice = async (id?: string) => {
           invoice,
         },
       });
+
+      isLoading.value = false;
+      openAlert.value = true;
+      alertType.value = 'success';
+      alertMsg.value = `La cotización se actualizó a la etapa ${invoice?.status}!`;
+
+      setTimeout(() => {
+        openAlert.value = false;
+        alertType.value = '';
+        alertMsg.value = '';
+      }, 3000);
     } catch (error) {
       console.error(error);
+      isLoading.value = false;
+      openAlert.value = true;
+      alertType.value = 'fail';
+      alertMsg.value = error as string;
     }
   }
 
   // - Delete currentInvoice
-  async function deleteInvoiceOnDb(id: number) {
+  async function deleteInvoiceOnDb(id: number | undefined) {
+    isLoading.value = true;
     try {
-      await $fetch('/api/cotizacion/:id/delete', {
+      await $fetch(`/api/cotizacion/${id}/delete`, {
         method: 'DELETE',
         body: {
           id,
         },
       });
+
+      setTimeout(() => {
+        isLoading.value = false;
+        openAlert.value = true;
+        alertType.value = 'success';
+        alertMsg.value = 'La cotización ha sido eliminada!';
+      }, 1000);
+
+      setTimeout(() => {
+        openAlert.value = false;
+        alertType.value = '';
+        alertMsg.value = '';
+      }, 4000);
     } catch (error) {
       console.error(error);
+      isLoading.value = false;
+      openAlert.value = true;
+      alertType.value = 'fail';
+      alertMsg.value = error as string;
     }
   }
 

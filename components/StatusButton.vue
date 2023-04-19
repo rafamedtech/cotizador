@@ -36,7 +36,7 @@ const iconName = computed((): string => {
     <button
       type="button"
       @click="openModal"
-      class="flex w-32 items-center justify-center gap-1 rounded-xl p-2 text-white"
+      class="flex w-32 items-center justify-center gap-1 rounded-md p-2 text-white"
       :class="{
         'bg-orange-500  dark:bg-orange-500/50': status === 'Pendiente',
         'bg-green-500  dark:bg-green-500/50': status === 'Vendida',

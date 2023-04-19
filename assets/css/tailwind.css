@@ -151,6 +151,7 @@
 
 .list-enter-active {
   transition: all 0.4s ease;
+  transition-delay: 100ms;
 }
 
 .list-leave-from {
@@ -172,12 +173,42 @@
   transition: all 0.3s ease;
 }
 
+.alert-enter-from {
+  /* opacity: 0; */
+  transform: translateY(-100px);
+}
+
+.alert-enter-to {
+  /* opacity: 1; */
+  transform: translateY(0);
+}
+
+.alert-enter-active,
+.alert-leave-active {
+  transition: all 0.4s ease;
+}
+
+.alert-leave-from {
+  /* opacity: 1; */
+  transform: translateY(0);
+}
+
+.alert-leave-to {
+  /* opacity: 0; */
+  transform: translateY(-100px);
+}
+
+/* .alert-leave-active {
+  transition: all 0.4s ease;
+   position: absolute; 
+} */
+
 @layer utilities {
   .modal-box {
     @apply w-full;
   }
 
   .input {
-    @apply rounded-xl border-none py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-300 placeholder:italic focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong dark:focus:bg-dark-medium;
+    @apply input-bordered rounded-lg border-light-strong py-1 px-3 text-[0.9rem] leading-8 text-dark-medium outline-none transition-all duration-300 placeholder:italic focus:border-transparent  focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong dark:focus:bg-dark-medium;
   }
 }

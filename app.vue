@@ -1,23 +1,19 @@
 <script setup>
-const { modalActive, customModal, isLoadingFull } = storeToRefs(useStore());
+const store = useStore();
+const { isLoadingFull, openAlert } = storeToRefs(store);
 </script>
 
 <template>
   <main class="relative">
     <NuxtLayout>
-      <div
-        class="relative flex flex-[1] flex-col overflow-x-auto bg-light-medium p-0 transition-all duration-300 dark:bg-[#222222]"
-      >
-        <MyModal v-if="modalActive" />
-        <CustomModal v-if="customModal" />
-
-        <NuxtPage />
-      </div>
+      <NuxtPage />
     </NuxtLayout>
 
-    <div class="fixed inset-0 h-screen w-screen transition-all" v-if="isLoadingFull">
-      <ScreenLoader />
-    </div>
+    <ScreenLoader v-if="isLoadingFull" />
+    <AppModal />
+    <Transition name="alert">
+      <AlertCard v-if="openAlert" />
+    </Transition>
   </main>
 </template>
 
@@ -33,19 +29,19 @@ const { modalActive, customModal, isLoadingFull } = storeToRefs(useStore());
 
 // animated invoice
 
-.page-enter-active,
-.page-leave-active {
-  transition: 0.3s ease all;
-}
+// .page-enter-active,
+// .page-leave-active {
+//   transition: 0.3s ease all;
+// }
 
-.page-enter-from {
-  transform: translateX(-30px);
-  opacity: 0;
-}
-.page-leave-to {
-  transform: translateX(30px);
-  opacity: 0;
-}
+// .page-enter-from {
+//   transform: translateX(-30px);
+//   opacity: 0;
+// }
+// .page-leave-to {
+//   transform: translateX(30px);
+//   opacity: 0;
+// }
 
 // utility classes
 
@@ -65,60 +61,55 @@ const { modalActive, customModal, isLoadingFull } = storeToRefs(useStore());
   }
 }
 
-.nav-link {
-  text-decoration: none;
-  color: initial;
-}
-
 // Status Button Styling
 
-.status-button {
-  &::before {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: none;
-  }
-  @media (min-width: 900px) {
-    display: initial;
-    inset: initial;
-    width: 10rem;
-    justify-content: center;
-  }
-  font-size: 12px;
-  align-items: center;
-  border-radius: 10px;
-}
+// .status-button {
+//   &::before {
+//     content: '';
+//     width: 10px;
+//     height: 10px;
+//     border-radius: 50%;
+//     display: none;
+//   }
+//   @media (min-width: 900px) {
+//     display: initial;
+//     inset: initial;
+//     width: 10rem;
+//     justify-content: center;
+//   }
+//   font-size: 12px;
+//   align-items: center;
+//   border-radius: 10px;
+// }
 
-.paid {
-  &::before {
-    background-color: #29b385;
-  }
-  color: #29b385;
-  background-color: rgba(51, 214, 160, 0.1);
-}
+// .paid {
+//   &::before {
+//     background-color: #29b385;
+//   }
+//   color: #29b385;
+//   background-color: rgba(51, 214, 160, 0.1);
+// }
 
-.pending {
-  &::before {
-    background-color: #ff8f00;
-  }
-  color: #ff8f00;
-  background-color: rgba(255, 145, 0, 0.1);
-}
-.canceled {
-  &::before {
-    @apply bg-red-500;
-  }
-  @apply bg-red-500/10 text-red-500;
-}
+// .pending {
+//   &::before {
+//     background-color: #ff8f00;
+//   }
+//   color: #ff8f00;
+//   background-color: rgba(255, 145, 0, 0.1);
+// }
+// .canceled {
+//   &::before {
+//     @apply bg-red-500;
+//   }
+//   @apply bg-red-500/10 text-red-500;
+// }
 
-.draft {
-  &::before {
-    background-color: #747680;
-  }
-  // color: #747680;
-  @apply text-[#747680] dark:bg-[#747680]/50 dark:text-light-medium;
-  background-color: rgba(223, 227, 250, 0.5);
-}
+// .draft {
+//   &::before {
+//     background-color: #747680;
+//   }
+//   // color: #747680;
+//   @apply text-[#747680] dark:bg-[#747680]/50 dark:text-light-medium;
+//   background-color: rgba(223, 227, 250, 0.5);
+// }
 </style>

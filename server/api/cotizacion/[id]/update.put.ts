@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import type { InvoiceItem } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -9,31 +10,48 @@ export default defineEventHandler(async (event) => {
 
   // Update invoice with prisma
 
-  // const items = await prisma.invoiceItem.updateMany({
-  // where: {
-  //     invoiceId: invoice.id
-  // },
-  // data: {
-  //     itemName:
-  // }
-  // })
-
-  const invoiceToUpdate = await prisma.invoice.updateMany({
-    where: {
-      id: invoice.id,
+  const updatedInvoice = await prisma.invoice.update({
+    where: { id: invoice.id },
+    data: {
+      clientName: invoice.clientName,
+      clientName2: invoice.clientName2,
+      clientEmail: invoice.clientEmail,
+      clientEmail2: invoice.clientEmail2,
+      currencyType: invoice.currencyType,
+      exchangeCost: invoice.exchangeCost,
+      eta: invoice.eta,
+      paymentDueDate: invoice.paymentDueDate,
+      paymentType: invoice.paymentType,
+      notes: invoice.notes,
+      invoiceItems: {
+        // create new invoice items if there are any
+        create: invoice.invoiceItems.filter((item: InvoiceItem) => !item.id),
+        // update existing invoice items
+        update: invoice.invoiceItems
+          .filter((item: InvoiceItem) => item.id)
+          .map((item: InvoiceItem) => ({
+            where: { id: item.id },
+            data: {
+              itemId: item.itemId,
+              itemName: item.itemName,
+              condition: item.condition,
+              qty: item.qty,
+              partNo: item.partNo,
+              price: item.price,
+              total: item.total,
+            },
+          })),
+      },
+      invoiceTax: invoice.invoiceTax,
+      invoiceSubtotal: invoice.invoiceSubtotal,
+      invoiceTotal: invoice.invoiceTotal,
+      status: invoice.status,
     },
-    data: {},
+    // include the nested invoiceItems model in the query response
+    include: { invoiceItems: true },
   });
 
-  //   if (!invoice) {
-  //     throw createError({
-  //       statusCode: 404,
-  //       statusMessage: 'Invoice not found',
-  //     });
-  //   }
-
-  //   return {
-  //     invoice,
-  //     items,
-  //   };
+  return {
+    updatedInvoice,
+  };
 });
