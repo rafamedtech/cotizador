@@ -11,26 +11,12 @@ const { id }: any = params;
 const { currentInvoice, updateStatusOnDb } = await useInvoice(id);
 const invoiceItemList = currentInvoice.value?.invoiceItems;
 
-// const { editCurrentInvoice } = store;
 const { isLoading, isLoadingFull, backBtn, modalType } = storeToRefs(store);
 const user = useSupabaseUser();
 
 isLoadingFull.value = false;
 
 const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-
-// const toggleEditInvoice = () => {
-//   editCurrentInvoice();
-//   invoiceBtn.value?.click();
-//   const html = document.querySelector('html');
-//   if (html) {
-//     html.style.overflowY = 'hidden';
-//   }
-// };
-
-// Modals
-
-// const modalBtn = ref<HTMLElement | null>(null);
 
 function toggleModal() {
   const html: HTMLHtmlElement | null = document.querySelector('html');
@@ -49,7 +35,6 @@ function generatePDF() {
 }
 
 async function sendEmail() {
-  // const { currentInvoice } = await useInvoice(id.toString());
   isLoading.value = true;
 
   try {
@@ -128,10 +113,10 @@ definePageMeta({
 
 <template>
   <main
-    class="relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pt-2 pb-6 print:px-10 lg:px-10"
+    class="relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pt-2 pb-24 print:px-10 lg:px-10 lg:pb-6"
   >
     <div v-if="currentInvoice && user" class="invoice-view my-container mb-4 print:hidden">
-      <NuxtLink class="nav-link flex gap-2" :to="{ name: 'index' }">
+      <NuxtLink class="nav-link flex gap-2" :to="{ name: 'cotizaciones' }">
         <Icon class="text-2xl text-primary" name="heroicons-solid:arrow-left" />
         <span class="text-dark-medium dark:text-light-strong">Regresar</span>
       </NuxtLink>
@@ -255,7 +240,7 @@ definePageMeta({
     <!-- Invoice body -->
     <div id="pdf-content" class="w-full">
       <section
-        class="rounded-[0.75rem] bg-white pt-4 shadow-pinterest dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
+        class="rounded-box bg-white pt-4 shadow-pinterest dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
       >
         <section class="relative flex h-full justify-between px-4 lg:px-8">
           <div class="mb-4 h-fit">
@@ -268,10 +253,7 @@ definePageMeta({
             </span>
             <p
               class="w-[40ch] text-[6px] text-dark-strong dark:text-light-strong print:w-[80ch] lg:w-[70ch]"
-            >
-              SISTEMAS DE CONTROL ELÉCTRICO, ELECTRÓNICO, NEUMÁTICO, AUTOMATIZACIÓN, FILTRACIÓN,
-              CONTROL DE FLAMA, PRESIÓN, TEMPERATURA, BOMBEO, TRATAMIENTO DE AGUA Y ALMACENAMIENTO
-            </p>
+            ></p>
             <a
               class="text-[10px] text-dark-strong dark:text-light-strong"
               href="https://www.gcosoluciones.com"
@@ -324,17 +306,19 @@ definePageMeta({
         </section>
 
         <!-- Customer information section -->
-        <section class="rounded-[20px] pb-4">
+        <section class="rounded-box pb-4">
           <h2
             class="mx-auto mb-4 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong"
           >
             Información del cliente
           </h2>
 
-          <ul class="grid grid-cols-3 px-4 text-[9px] print:grid-cols-5 lg:grid-cols-5 lg:px-8">
+          <ul
+            class="grid grid-cols-3 gap-4 px-4 text-[9px] print:grid-cols-5 lg:grid-cols-5 lg:px-8"
+          >
             <li class="text-center">
               <h3
-                class="mb-2 border-b border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
+                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Nombre
               </h3>
@@ -353,7 +337,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-b border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
+                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Empresa
               </h3>
@@ -366,7 +350,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-b border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
+                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Forma de pago
               </h3>
@@ -379,7 +363,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-b border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
+                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Moneda
               </h3>
@@ -392,7 +376,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-b border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
+                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Tipo de cambio
               </h3>
@@ -410,7 +394,7 @@ definePageMeta({
 
       <!-- Items table -->
       <section
-        class="relative mt-4 max-h-[240px] min-h-[240px] overflow-x-auto rounded-[0.75rem] bg-white shadow-pinterest dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
+        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[240px] overflow-x-auto bg-white shadow-pinterest dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
       >
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
@@ -485,6 +469,59 @@ definePageMeta({
         </div>
       </section>
 
+      <!-- Items mobile -->
+      <section class="mt-4 print:hidden lg:hidden">
+        <h3
+          class="mx-auto mb-4 w-fit border-b-2 border-primary text-center text-xl text-dark-medium dark:text-light-medium"
+        >
+          Artículos
+        </h3>
+        <div
+          class="carousel-center carousel rounded-box max-w-md space-x-4 bg-light-strong p-4 shadow-pinterest dark:bg-dark-strong"
+        >
+          <div class="carousel-item" v-for="(item, index) in invoiceItemList" :key="index">
+            <div class="card bg-base-100 shadow-xl dark:bg-dark-medium">
+              <div class="card-body text-sm">
+                <h2 class="card-title w-52 text-sm text-dark-medium dark:text-light-medium">
+                  {{ item.itemName || 'Articulo sin descripcion' }}
+                </h2>
+                <p class="text-dark-medium dark:text-light-medium">
+                  <span class="font-bold text-primary dark:text-primary/50">Condición:</span>
+                  {{ item.condition }}
+                </p>
+                <p class="text-dark-medium dark:text-light-medium">
+                  <span class="font-bold text-primary dark:text-primary/50">Cantidad:</span>
+                  {{ item.qty }}
+                </p>
+                <p class="text-dark-medium dark:text-light-medium">
+                  <span class="font-bold text-primary dark:text-primary/50">Precio unitario:</span>
+                  {{
+                    new Intl.NumberFormat('es-MX', {
+                      style: 'currency',
+                      currency: 'MXN',
+                    }).format(item.price)
+                  }}
+                </p>
+                <div class="card-actions items-center">
+                  <button
+                    class="btn flex gap-2 border-light-strong bg-white text-primary dark:border-dark-medium dark:bg-dark-strong"
+                  >
+                    <span class="text-dark-medium dark:text-light-medium">Importe: </span>
+                    <span>
+                      {{
+                        new Intl.NumberFormat('es-MX', {
+                          style: 'currency',
+                          currency: 'MXN',
+                        }).format(item.total)
+                      }}</span
+                    >
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       <!-- Terms and total sections -->
       <section
         class="flex w-full flex-col-reverse gap-4 overflow-y-hidden py-4 print:flex-row lg:flex-row"
@@ -553,7 +590,7 @@ definePageMeta({
           <div class="divide divider my-0 w-full"></div>
           <div class="flex w-full justify-between font-bold">
             <p class="text-primary dark:text-primary/50">Total</p>
-            <p class="text-dark-strong dark:text-light-strong">
+            <p class="text-primary">
               <!-- Total -->
               {{
                 new Intl.NumberFormat('es-MX', {

@@ -51,14 +51,11 @@ definePageMeta({
     name: 'slide',
     mode: 'out-in',
   },
-  layoutTransition: {
-    name: 'slide',
-  },
 });
 </script>
 
 <template>
-  <main class="min-h-screen overflow-x-hidden">
+  <main class="min-h-screen overflow-x-hidden dark:bg-dark-medium">
     <section
       class="container mx-auto flex flex-col flex-wrap items-center justify-center px-5 py-24 text-gray-400 lg:gap-8"
     >
@@ -83,7 +80,7 @@ definePageMeta({
               id="email"
               name="email"
               placeholder="Ej. correo@ejemplo.com"
-              class="input-primary input w-full py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
+              class="input-primary input w-full bg-light-medium py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
               :class="{
                 ' border border-red-500 focus:border-red-500': v$.email.$error,
                 'border border-[#42d392] ': !v$.email.$invalid,
@@ -115,7 +112,7 @@ definePageMeta({
               v-model="formData.password"
               name="password"
               type="password"
-              class="input-primary input w-full py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
+              class="input-primary input w-full bg-light-medium py-1 px-3 text-base leading-8 text-dark-medium outline-none transition-all duration-500 focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
               :class="{
                 ' border-red-500 focus:border-red-500': v$.password.$error,
                 'border-[#42d392]': !v$.password.$invalid,

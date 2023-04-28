@@ -46,7 +46,7 @@ async function onAction() {
   switch (modalType.value) {
     case Modal.Discard:
       backBtn.value?.click();
-      await navigateTo('/');
+      await navigateTo('/cotizaciones');
       break;
     case Modal.DiscardEdit:
       backBtn.value?.click();
@@ -62,7 +62,7 @@ async function onAction() {
       const { currentInvoice } = await useInvoice(id.toString());
       await deleteInvoiceOnDb(currentInvoice.value?.id);
       toggleModal();
-      await navigateTo('/');
+      await navigateTo('/cotizaciones');
       break;
     case Modal.Email:
       toggleModal();

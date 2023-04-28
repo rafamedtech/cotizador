@@ -27,27 +27,11 @@ const { isLoadingFull, openAlert } = storeToRefs(store);
   }
 }
 
-// animated invoice
-
-// .page-enter-active,
-// .page-leave-active {
-//   transition: 0.3s ease all;
-// }
-
-// .page-enter-from {
-//   transform: translateX(-30px);
-//   opacity: 0;
-// }
-// .page-leave-to {
-//   transform: translateX(30px);
-//   opacity: 0;
-// }
-
 // utility classes
 
 .custom-container {
   width: 100%;
-  padding: 40px 10px;
+  padding: 40px 10px 8rem 10px;
   max-width: 850px;
   margin: 0 auto;
 
@@ -60,56 +44,4 @@ const { isLoadingFull, openAlert } = storeToRefs(store);
     padding: 72px 10px 40px 10px;
   }
 }
-
-// Status Button Styling
-
-// .status-button {
-//   &::before {
-//     content: '';
-//     width: 10px;
-//     height: 10px;
-//     border-radius: 50%;
-//     display: none;
-//   }
-//   @media (min-width: 900px) {
-//     display: initial;
-//     inset: initial;
-//     width: 10rem;
-//     justify-content: center;
-//   }
-//   font-size: 12px;
-//   align-items: center;
-//   border-radius: 10px;
-// }
-
-// .paid {
-//   &::before {
-//     background-color: #29b385;
-//   }
-//   color: #29b385;
-//   background-color: rgba(51, 214, 160, 0.1);
-// }
-
-// .pending {
-//   &::before {
-//     background-color: #ff8f00;
-//   }
-//   color: #ff8f00;
-//   background-color: rgba(255, 145, 0, 0.1);
-// }
-// .canceled {
-//   &::before {
-//     @apply bg-red-500;
-//   }
-//   @apply bg-red-500/10 text-red-500;
-// }
-
-// .draft {
-//   &::before {
-//     background-color: #747680;
-//   }
-//   // color: #747680;
-//   @apply text-[#747680] dark:bg-[#747680]/50 dark:text-light-medium;
-//   background-color: rgba(223, 227, 250, 0.5);
-// }
 </style>

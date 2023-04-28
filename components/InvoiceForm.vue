@@ -9,7 +9,7 @@ import { uid } from 'uid';
 
 // Type imports
 import type Contact from '@/types/contact';
-import { InvoiceDraft, InvoiceWithItems } from '@/types/invoice';
+import { InvoiceDraft } from '@/types/invoice';
 import { Modal } from '@/types/modal';
 
 interface Props {
@@ -73,25 +73,6 @@ if (props.edit) {
   }
 }
 
-// function clearInvoice() {
-//   invoiceObject.status = 'Borrador';
-//   invoiceObject.clientCompany = '';
-//   invoiceObject.clientName = '';
-//   invoiceObject.clientName2 = '';
-//   invoiceObject.clientEmail = '';
-//   invoiceObject.clientEmail2 = '';
-//   invoiceObject.currencyType = 'MX';
-//   invoiceObject.exchangeCost = 0;
-//   invoiceObject.eta = 'Inmediata';
-//   invoiceObject.notes = '';
-//   invoiceObject.paymentDueDate = '';
-//   invoiceObject.condition = '';
-//   invoiceObject.paymentType = '';
-//   invoiceObject.featureType = 'texto';
-//   invoiceObject.invoiceItem = [{ itemName: '', qty: 1, partNo: '', price: 0, total: 0 }];
-//   isLoading.value = false;
-// }
-
 // Saved contacts menu
 const contactsModal = ref(false);
 const { contactData, backBtn, isLoading, filterResults } = storeToRefs(store);
@@ -141,13 +122,12 @@ const rules = computed(() => {
   return {
     paymentDueDate: {
       required: helpers.withMessage('Es necesario ingresar una fecha', required),
-      minValue: helpers.withMessage('La fecha mínima es al dia siguiente', (value) => {
+      minValue: helpers.withMessage('La fecha mínima es al día siguiente', (value) => {
         return (
           new Date(value as Date).toLocaleString('es-MX', dateOptions) >
           new Date().toLocaleString('es-MX', dateOptions)
         );
       }),
-      // minValue: helpers.withMessage('La fecha es inválida', minValue(Date.now())),
     },
     clientCompany: { required: helpers.withMessage('Este campo es obligatorio', required) },
     clientName: { required: helpers.withMessage('Este campo es obligatorio', required) },
@@ -160,7 +140,6 @@ const rules = computed(() => {
     },
     paymentTerms: { minValue: helpers.withMessage('Este campo es obligatorio', minValue(1)) },
     paymentType: { required: helpers.withMessage('Este campo es obligatorio', required) },
-    // condition: { required: helpers.withMessage('Este campo es obligatorio', required) },
     notes: {
       maxLength: helpers.withMessage('Solo se permite hasta 255 caracteres', maxLength(255)),
     },
@@ -221,15 +200,18 @@ function toggleModal() {
 
 const errorBorder = computed(() => (v$.value.date.$error ? colors.red[500] : colors.gray[300]));
 
-watch(
-  () => invoiceObject.paymentDueDate,
-  () => {
-    console.log(invoiceObject.paymentDueDate);
-  }
-);
+// const uploadInvoice = async () => {
+//   const { newInvoice } = await useInvoice();
+//   await newInvoice({
+//     ...invoiceObject,
+//     invId: invoiceObject.invId.toString(),
+//     invoiceSubtotal: invoiceSubtotal.value,
+//     invoiceTax: invoiceTax.value,
+//     invoiceTotal: invoiceTotal.value,
+//   });
+// };
 
-// const formattedDate = computed(() => invoiceObject.paymentDueDate.toLocaleString('es-MX', dateOptions))
-const uploadInvoice = async () => {
+async function uploadInvoice() {
   const { newInvoice } = await useInvoice();
   await newInvoice({
     ...invoiceObject,
@@ -238,7 +220,7 @@ const uploadInvoice = async () => {
     invoiceTax: invoiceTax.value,
     invoiceTotal: invoiceTotal.value,
   });
-};
+}
 
 async function onSubmit() {
   v$.value.$validate();
@@ -323,17 +305,17 @@ function discardInvoice() {
               </label>
             </div>
 
-            <div v-if="filteredContacts.length > 0 && contactsModal" class="w-1/2">
+            <div v-if="filteredContacts.length > 0 && contactsModal" class="w-full lg:w-1/2">
               <ul
-                class="dropdown-content menu min-h-12 flex max-h-[250px] w-full rounded-[10px] bg-white p-2 shadow-lg dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong"
+                class="dropdown-content menu min-h-12 flex w-full flex-col overflow-y-scroll rounded-[10px] bg-white p-2 shadow-lg dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong lg:max-h-[250px]"
               >
                 <span class="py-2 pl-2 italic text-primary">Contactos disponibles</span>
                 <li
-                  class="cursor-pointer text-dark-medium hover:text-primary dark:text-light-medium dark:hover:text-primary"
+                  class="cursor-pointer overflow-x-hidden text-dark-medium hover:text-primary dark:text-light-medium dark:hover:text-primary"
                   v-for="filteredContact in filteredContacts"
                   :key="filteredContact.clientCompany"
                 >
-                  <button @click="setContact(filteredContact)">
+                  <button class="text-left" @click="setContact(filteredContact)">
                     {{ filteredContact.clientCompany }}
                   </button>
                 </li>
@@ -388,7 +370,7 @@ function discardInvoice() {
                 :value="invoiceObject.invoiceDate.toLocaleDateString('es-MX', dateOptions)"
               />
             </div> -->
-          <BaseInput label="Fecha" :model-value="invoiceObject.invoiceDate" isrequired disabled />
+          <BaseInput label="Fecha" :model-value="invoiceObject.invoiceDate" disabled />
 
           <div class="form-control flex w-full flex-col">
             <label for="paymentDueDate" class="dark:text-light-strong"
@@ -490,7 +472,7 @@ function discardInvoice() {
         >
           Contactos
         </h4>
-        <div class="mb-4 flex w-full gap-8">
+        <div class="mb-4 flex w-full gap-4 lg:gap-8">
           <div class="mb-2 w-1/2">
             <h5 class="mb-2 w-fit text-primary dark:text-primary/50">Contacto 1</h5>
             <!-- <div class="form-control relative mb-2 flex flex-col">
@@ -621,7 +603,7 @@ function discardInvoice() {
         <div class="divider"></div>
 
         <div class="flex flex-col">
-          <div class="mt-8">
+          <div class="mt-8 hidden lg:block">
             <h3
               class="mb-4 w-fit border-b border-dark-medium text-lg font-bold text-primary dark:border-light-medium dark:text-primary/50"
             >
@@ -730,74 +712,220 @@ function discardInvoice() {
               Agregar artículo
             </section>
 
-            <section class="form-control mt-8 mb-4 flex flex-col">
-              <label for="notes" class="">Notas</label>
-              <textarea
-                id="notes"
-                class="input-bordered input-primary input h-60 bg-light-medium focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
-                v-model="invoiceObject.notes"
-                @input="v$.notes.$touch"
-                maxlength="100"
-              ></textarea>
-              <label class="label">
-                <span v-if="v$.notes.$error" class="label-text-alt text-red-500">{{
-                  v$.notes.$errors[0].$message
-                }}</span>
-              </label>
-            </section>
-
-            <section class="mb-4 flex flex-col gap-2">
-              <div class="flex w-full justify-end gap-4 pr-4 font-bold">
-                <p class="text-primary">Subtotal:</p>
-                <p class="text-dark-medium dark:text-light-medium">
-                  {{
-                    new Intl.NumberFormat('es-MX', {
-                      style: 'currency',
-                      currency: 'MXN',
-                    }).format(invoiceSubtotal)
-                  }}
-                </p>
-              </div>
-              <div class="flex w-full justify-end gap-4 pr-4 font-bold">
-                <p class="text-primary">Impuestos:</p>
-                <p class="text-dark-medium dark:text-light-medium">
-                  {{
-                    new Intl.NumberFormat('es-MX', {
-                      style: 'currency',
-                      currency: 'MXN',
-                    }).format(invoiceTax)
-                  }}
-                </p>
-              </div>
-              <div class="flex w-full justify-end gap-4 pr-4 font-bold">
-                <p class="text-primary">Total:</p>
-                <p class="text-dark-medium dark:text-light-medium">
-                  {{
-                    new Intl.NumberFormat('es-MX', {
-                      style: 'currency',
-                      currency: 'MXN',
-                    }).format(invoiceTotal)
-                  }}
-                </p>
-              </div>
-            </section>
-
-            <div class="flex flex-col gap-2 lg:flex-row lg:justify-end">
-              <button
-                type="button"
-                @click="discardInvoice"
-                class="btn border-none hover:text-primary focus:outline-primary dark:bg-light-strong/50 dark:hover:text-primary lg:w-56"
-              >
-                <span>Cancelar</span>
-              </button>
-              <button
-                class="btn border-none bg-primary text-light-medium hover:bg-primary/50 focus:outline-primary dark:bg-primary/50 dark:hover:bg-primary lg:w-56"
-              >
-                <LoadingSpinner v-if="isLoading" />
-                <span v-else>{{ edit ? 'Actualizar Cotización' : 'Crear Cotización' }}</span>
-              </button>
-            </div>
             <!-- </div> -->
+          </div>
+          <section class="mt-4 print:hidden lg:hidden">
+            <h3
+              class="mb-4 w-fit border-b border-dark-medium text-lg font-bold text-primary dark:border-light-medium dark:text-primary/50"
+            >
+              Artículos
+            </h3>
+            <div
+              class="rounded-box flex max-w-md flex-col space-x-4 bg-light-strong p-4 shadow-pinterest dark:bg-dark-strong"
+            >
+              <div class="flex flex-col gap-4">
+                <TransitionGroup
+                  name="list"
+                  tag="tbody"
+                  class="mb-4 flex w-full flex-col gap-4"
+                  appear
+                >
+                  <div
+                    class="card relative bg-base-100 shadow-xl dark:bg-dark-medium"
+                    v-for="(item, index) in invoiceObject.invoiceItems"
+                    :key="index"
+                  >
+                    <div class="card-body text-sm">
+                      <!-- <h2 class="card-title w-52 text-sm text-dark-medium dark:text-light-medium">
+                      {{ item.itemName || 'Articulo sin descripcion' }}
+                    </h2>
+                   -->
+                      <div class="form-control">
+                        <!-- <label class="label">
+                        <span class="label-text">Your Email</span>
+                      </label> -->
+                        <label class="input-group">
+                          <span
+                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            >Nombre</span
+                          >
+                          <input
+                            type="text"
+                            placeholder="Descripción del artículo"
+                            class="input-bordered input dark:border-dark-strong"
+                            v-model.trim="item.itemName"
+                          />
+                        </label>
+                      </div>
+                      <div class="form-control">
+                        <label class="input-group w-full"
+                          ><span
+                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            >Condición
+                          </span>
+                          <select class="input-bordered input w-full" v-model="item.condition">
+                            <option value="N/A" class="dark:text-light-strong">N/A</option>
+                            <option value="Nuevo" class="dark:text-light-strong">Nuevo</option>
+                            <option value="Usado" class="dark:text-light-strong">Usado</option>
+                            <option value="Refurbished" class="dark:text-light-strong">
+                              Refurbished
+                            </option>
+                          </select>
+                        </label>
+                      </div>
+                      <div class="form-control">
+                        <!-- <label class="label">
+                        <span class="label-text">Enter amount</span>
+                      </label> -->
+                        <label class="input-group">
+                          <span
+                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            >Cantidad</span
+                          >
+                          <input
+                            type="text"
+                            class="input-bordered input dark:border-dark-strong"
+                            v-model.trim="item.qty"
+                          />
+                        </label>
+                      </div>
+                      <div class="form-control">
+                        <!-- <label class="label">
+                        <span class="label-text">Enter amount</span>
+                      </label> -->
+                        <label class="input-group">
+                          <span
+                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            >Precio $</span
+                          >
+                          <input
+                            type="text"
+                            class="input-bordered input dark:border-dark-strong"
+                            v-model.trim="item.price"
+                          />
+                        </label>
+                      </div>
+                      <!-- <p class="text-dark-medium dark:text-light-medium">
+                      <span class="font-bold text-primary dark:text-primary/50">Cantidad:</span>
+                      {{ item.qty }}
+                    </p> -->
+                      <!-- <p class="text-dark-medium dark:text-light-medium">
+                      <span class="font-bold text-primary dark:text-primary/50"
+                        >Precio unitario:</span
+                      >
+                      {{
+                        new Intl.NumberFormat('es-MX', {
+                          style: 'currency',
+                          currency: 'MXN',
+                        }).format(item.price)
+                      }}
+                    </p> -->
+                      <div class="card-actions w-full items-center">
+                        <button
+                          class="btn flex w-full gap-2 border-light-strong bg-white text-primary dark:border-dark-medium dark:bg-dark-strong"
+                        >
+                          <span class="text-dark-medium dark:text-light-medium">Importe: </span>
+                          <span>
+                            {{
+                              new Intl.NumberFormat('es-MX', {
+                                style: 'currency',
+                                currency: 'MXN',
+                              }).format((item.total = item.qty * item.price))
+                            }}</span
+                          >
+                        </button>
+                        <div
+                          class="absolute -top-2 right-0"
+                          v-if="invoiceObject.invoiceItems.length > 1"
+                        >
+                          <Icon
+                            @click="deleteInvoiceItem(item.itemId)"
+                            class="m-auto cursor-pointer text-primary"
+                            title="Borrar artículo"
+                            size="32"
+                            name="icon-park-outline:delete"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TransitionGroup>
+              </div>
+            </div>
+            <section
+              @click="addNewInvoiceItem"
+              class="btn mx-auto mt-4 flex w-fit gap-2 border-none bg-primary text-white hover:bg-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
+            >
+              <i class="fa-solid fa-plus"></i>
+              Agregar artículo
+            </section>
+          </section>
+          <section class="form-control mt-8 mb-4 flex flex-col">
+            <label for="notes" class="">Notas</label>
+            <textarea
+              id="notes"
+              class="input-bordered input-primary input h-60 resize-none bg-light-medium focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
+              v-model="invoiceObject.notes"
+              @input="v$.notes.$touch"
+              maxlength="100"
+            ></textarea>
+            <label class="label">
+              <span v-if="v$.notes.$error" class="label-text-alt text-red-500">{{
+                v$.notes.$errors[0].$message
+              }}</span>
+            </label>
+          </section>
+
+          <section class="mb-4 flex flex-col gap-2">
+            <div class="flex w-full justify-end gap-4 pr-4 font-bold">
+              <p class="text-primary">Subtotal:</p>
+              <p class="text-dark-medium dark:text-light-medium">
+                {{
+                  new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
+                  }).format(invoiceSubtotal)
+                }}
+              </p>
+            </div>
+            <div class="flex w-full justify-end gap-4 pr-4 font-bold">
+              <p class="text-primary">Impuestos:</p>
+              <p class="text-dark-medium dark:text-light-medium">
+                {{
+                  new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
+                  }).format(invoiceTax)
+                }}
+              </p>
+            </div>
+            <div class="flex w-full justify-end gap-4 pr-4 font-bold">
+              <p class="text-primary">Total:</p>
+              <p class="text-dark-medium dark:text-light-medium">
+                {{
+                  new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
+                  }).format(invoiceTotal)
+                }}
+              </p>
+            </div>
+          </section>
+
+          <div class="flex flex-col gap-2 lg:flex-row lg:justify-end">
+            <button
+              type="button"
+              @click="discardInvoice"
+              class="btn border-none hover:text-primary focus:outline-primary dark:bg-light-strong/50 dark:hover:text-primary lg:w-56"
+            >
+              <span>Cancelar</span>
+            </button>
+            <button
+              class="btn border-none bg-primary text-light-medium hover:bg-primary/50 focus:outline-primary dark:bg-primary/50 dark:hover:bg-primary lg:w-56"
+            >
+              <LoadingSpinner v-if="isLoading" />
+              <span v-else>{{ edit ? 'Actualizar Cotización' : 'Crear Cotización' }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -842,7 +970,7 @@ label {
   /* border-color: v-bind(errorBorder); */
   padding-left: 2rem;
   padding-right: 0;
-  width: 2rem m !important;
+  width: 2rem !important;
 }
 
 input[type='time'] {

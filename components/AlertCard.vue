@@ -19,7 +19,7 @@ const iconName = computed((): string => {
 
 <template>
   <div
-    class="alert absolute inset-x-0 top-4 mx-auto w-fit text-white shadow-lg"
+    class="alert absolute inset-x-0 top-4 z-[9999] mx-auto w-fit text-white shadow-lg"
     :class="{ 'bg-red-500': alertType === 'fail', 'bg-green-500': alertType === 'success' }"
   >
     <div>

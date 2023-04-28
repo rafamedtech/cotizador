@@ -22,7 +22,9 @@ definePageMeta({
 
 <template>
   <main>
-    <section class="container mt-4 flex flex-col items-center gap-8 lg:min-w-min lg:max-w-3xl">
+    <section
+      class="container mt-4 flex flex-col items-center gap-8 pb-24 lg:min-w-min lg:max-w-3xl"
+    >
       <button
         type="button"
         @click="discardInvoice"
