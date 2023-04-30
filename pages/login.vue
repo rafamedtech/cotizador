@@ -64,7 +64,7 @@ definePageMeta({
       </figure>
       <form
         @submit.prevent="submitForm"
-        class="bg-opacity-50 mt-10 flex w-full flex-col rounded-[20px] bg-white p-8 shadow-pinterest dark:bg-dark-strong md:mt-0 md:w-1/2 lg:w-2/6"
+        class="bg-opacity-50 mt-10 flex w-full flex-col rounded-[20px] border border-light-strong bg-white p-8 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong md:mt-0 md:w-1/2 lg:w-2/6"
       >
         <h2
           class="mb-5 w-fit border-b-2 border-primary text-lg font-medium text-dark-medium dark:border-primary/50 dark:text-light-strong"

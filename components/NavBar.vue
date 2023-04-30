@@ -114,7 +114,7 @@ const userLogout = () => {
   </header>
 </template>
 
-<style>
+<style scoped>
 .nav-links a.router-link-exact-active svg,
 .nav-links a.router-link-active svg {
   @apply active text-primary;

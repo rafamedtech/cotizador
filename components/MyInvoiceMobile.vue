@@ -18,7 +18,7 @@ const dateFormatted = computed(() =>
 <template>
   <NuxtLink
     :to="{ path: `/cotizacion/${invoice.invId}` }"
-    class="card w-96 bg-white shadow-pinterest dark:bg-dark-strong"
+    class="card w-96 border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong"
     @click="isLoadingFull = true"
   >
     <div class="card-body">
@@ -29,8 +29,8 @@ const dateFormatted = computed(() =>
         <span class="font-bold">Fecha:</span> {{ invoice.invoiceDate }}</span
       >
       <h2 class="card-title text-primary">{{ invoice.clientCompany }}</h2>
-      <p class="text-dark-medium dark:text-light-medium">
-        <span class="font-bold">Total:</span>
+      <p class="card-title text-dark-medium dark:text-light-medium">
+        <span class="font-bold text-primary">Total:</span>
         {{
           new Intl.NumberFormat('es-MX', {
             style: 'currency',

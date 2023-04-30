@@ -256,7 +256,7 @@ function discardInvoice() {
 
 <template>
   <div
-    class="card relative h-full border border-transparent bg-white p-4 shadow-pinterest transition-all dark:border-dark-medium dark:bg-dark-strong lg:min-w-min lg:max-w-3xl"
+    class="container card relative h-full border border-light-strong bg-white p-4 shadow-pinterest transition-all dark:border-dark-medium dark:bg-dark-strong lg:min-w-min lg:max-w-3xl"
   >
     <form @submit.prevent="onSubmit" class="scrollbar-form relative w-full">
       <h1
@@ -274,7 +274,7 @@ function discardInvoice() {
 
         <div class="flex w-full gap-8">
           <!-- Empresa -->
-          <div class="dropdown-bottom dropdown dropdown-end form-control relative mb-4 w-1/2">
+          <div class="dropdown-bottom dropdown-end dropdown form-control relative mb-4 w-1/2">
             <label class="label">
               <span class="label-text text-dark-strong dark:text-light-medium"
                 >Empresa<span class="text-red-500">*</span></span
@@ -616,7 +616,6 @@ function discardInvoice() {
                 >
                   <th class="item-name w-4/12">Descripción</th>
                   <th class="w-3/12">Condición</th>
-                  <!-- <th class="w-2/12"># Parte</th> -->
                   <th class="qty w-1/12">Ctd</th>
                   <th class="price w-2/12">Precio</th>
                   <th class="total w-2/12 text-center">Total</th>
@@ -630,8 +629,8 @@ function discardInvoice() {
               >
                 <tr
                   class="table-items relative flex items-start gap-2 lg:gap-4"
-                  v-for="(item, index) in invoiceObject.invoiceItems"
-                  :key="index"
+                  v-for="item in invoiceObject.invoiceItems"
+                  :key="item.itemId"
                 >
                   <td class="w-4/12">
                     <div class="form-control">
@@ -644,11 +643,6 @@ function discardInvoice() {
                     </div>
                   </td>
                   <td class="w-3/12">
-                    <!-- <input
-                      class="input w-full bg-light-medium focus:ring-primary dark:bg-dark-medium dark:text-light-strong"
-                      type="text"
-                      v-model="item.partNo"
-                    /> -->
                     <select
                       class="input-primary input w-full bg-light-medium"
                       v-model="item.condition"
@@ -720,39 +714,30 @@ function discardInvoice() {
             >
               Artículos
             </h3>
-            <div
-              class="rounded-box flex max-w-md flex-col space-x-4 bg-light-strong p-4 shadow-pinterest dark:bg-dark-strong"
-            >
+            <div class="rounded-box flex max-w-md flex-col">
               <div class="flex flex-col gap-4">
                 <TransitionGroup
-                  name="list"
-                  tag="tbody"
+                  tag="section"
                   class="mb-4 flex w-full flex-col gap-4"
+                  name="list"
                   appear
                 >
                   <div
-                    class="card relative bg-base-100 shadow-xl dark:bg-dark-medium"
-                    v-for="(item, index) in invoiceObject.invoiceItems"
-                    :key="index"
+                    class="card relative border border-light-strong bg-base-100 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong"
+                    v-for="item in invoiceObject.invoiceItems"
+                    :key="item.itemId"
                   >
-                    <div class="card-body text-sm">
-                      <!-- <h2 class="card-title w-52 text-sm text-dark-medium dark:text-light-medium">
-                      {{ item.itemName || 'Articulo sin descripcion' }}
-                    </h2>
-                   -->
+                    <div class="card-body p-4 text-sm">
                       <div class="form-control">
-                        <!-- <label class="label">
-                        <span class="label-text">Your Email</span>
-                      </label> -->
                         <label class="input-group">
                           <span
-                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            class="w-32 bg-light-strong text-dark-medium dark:bg-dark-medium dark:text-light-medium"
                             >Nombre</span
                           >
                           <input
                             type="text"
                             placeholder="Descripción del artículo"
-                            class="input-bordered input dark:border-dark-strong"
+                            class="input-bordered input w-full dark:border-dark-strong"
                             v-model.trim="item.itemName"
                           />
                         </label>
@@ -760,7 +745,7 @@ function discardInvoice() {
                       <div class="form-control">
                         <label class="input-group w-full"
                           ><span
-                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            class="w-32 bg-light-strong text-dark-medium dark:bg-dark-medium dark:text-light-medium"
                             >Condición
                           </span>
                           <select class="input-bordered input w-full" v-model="item.condition">
@@ -774,52 +759,32 @@ function discardInvoice() {
                         </label>
                       </div>
                       <div class="form-control">
-                        <!-- <label class="label">
-                        <span class="label-text">Enter amount</span>
-                      </label> -->
                         <label class="input-group">
                           <span
-                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            class="w-32 bg-light-strong text-dark-medium dark:bg-dark-medium dark:text-light-medium"
                             >Cantidad</span
                           >
                           <input
                             type="text"
-                            class="input-bordered input dark:border-dark-strong"
+                            class="input-bordered input w-full dark:border-dark-strong"
                             v-model.trim="item.qty"
                           />
                         </label>
                       </div>
                       <div class="form-control">
-                        <!-- <label class="label">
-                        <span class="label-text">Enter amount</span>
-                      </label> -->
                         <label class="input-group">
                           <span
-                            class="w-20 bg-light-strong text-dark-medium dark:bg-dark-strong dark:text-light-medium"
+                            class="w-32 bg-light-strong text-dark-medium dark:bg-dark-medium dark:text-light-medium"
                             >Precio $</span
                           >
                           <input
                             type="text"
-                            class="input-bordered input dark:border-dark-strong"
+                            class="input-bordered input w-full dark:border-dark-strong"
                             v-model.trim="item.price"
                           />
                         </label>
                       </div>
-                      <!-- <p class="text-dark-medium dark:text-light-medium">
-                      <span class="font-bold text-primary dark:text-primary/50">Cantidad:</span>
-                      {{ item.qty }}
-                    </p> -->
-                      <!-- <p class="text-dark-medium dark:text-light-medium">
-                      <span class="font-bold text-primary dark:text-primary/50"
-                        >Precio unitario:</span
-                      >
-                      {{
-                        new Intl.NumberFormat('es-MX', {
-                          style: 'currency',
-                          currency: 'MXN',
-                        }).format(item.price)
-                      }}
-                    </p> -->
+
                       <div class="card-actions w-full items-center">
                         <button
                           class="btn flex w-full gap-2 border-light-strong bg-white text-primary dark:border-dark-medium dark:bg-dark-strong"
@@ -852,14 +817,17 @@ function discardInvoice() {
                 </TransitionGroup>
               </div>
             </div>
-            <section
+
+            <button
+              type="button"
               @click="addNewInvoiceItem"
               class="btn mx-auto mt-4 flex w-fit gap-2 border-none bg-primary text-white hover:bg-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
             >
               <i class="fa-solid fa-plus"></i>
               Agregar artículo
-            </section>
+            </button>
           </section>
+
           <section class="form-control mt-8 mb-4 flex flex-col">
             <label for="notes" class="">Notas</label>
             <textarea

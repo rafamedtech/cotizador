@@ -122,7 +122,7 @@ definePageMeta({
       </NuxtLink>
       <!-- Header -->
       <div
-        class="header flex flex-col gap-4 rounded-lg bg-white shadow-pinterest dark:bg-dark-strong lg:flex-row"
+        class="header rounded-box flex flex-col gap-4 border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong lg:flex-row"
       >
         <div class="dropdown-bottom dropdown form-control relative mb-4 h-full w-1/2 items-end">
           <label class="label w-full text-center">
@@ -169,7 +169,7 @@ definePageMeta({
           <NuxtLink
             v-if="currentInvoice.status === 'Borrador' || currentInvoice.status === 'Pendiente'"
             :to="`/cotizacion/${currentInvoice.invId}/editar`"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
           >
             <!-- @click="toggleEditInvoice" -->
             <Icon
@@ -181,7 +181,7 @@ definePageMeta({
           <label ref="backBtn" for="my-modal-6" class="hidden"></label>
           <button
             @click="deleteInvoice"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
           >
             <Icon class="text-xl text-primary" name="icon-park-outline:delete" />
 
@@ -190,13 +190,13 @@ definePageMeta({
 
           <button
             @click="generatePDF"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
           >
             <Icon name="icon-park-outline:doc-detail" class="text-xl" />
             PDF
           </button>
           <button
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-[9px] text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
             @click="sendEmail"
           >
             <!-- <LoadingSpinner v-if="isLoading && modalType === Modal.Email" /> -->
@@ -240,10 +240,10 @@ definePageMeta({
     <!-- Invoice body -->
     <div id="pdf-content" class="w-full">
       <section
-        class="rounded-box bg-white pt-4 shadow-pinterest dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
+        class="rounded-box border border-light-strong bg-white pt-4 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
       >
         <section class="relative flex h-full justify-between px-4 lg:px-8">
-          <div class="mb-4 h-fit">
+          <div class="mb-4 h-full w-1/2">
             <img
               class="my-4 mb-2 h-12 bg-dark-medium dark:bg-transparent"
               src="@/assets/images/Suntech-logo-cropped.png"
@@ -259,8 +259,6 @@ definePageMeta({
               href="https://www.gcosoluciones.com"
               >www.suntechelectronics.com</a
             >
-            <!-- <p class="text-[6px] leading-tight">ALMA PATRICIA GARCIA SOTELO</p>
-            <p class="text-[6px] leading-tight text-secondary">RFC: GASA741127MJ4</p> -->
           </div>
           <h1
             class="absolute inset-0 top-2 hidden h-fit text-center text-xl font-bold uppercase italic text-primary dark:text-primary/50 lg:block"
@@ -272,18 +270,14 @@ definePageMeta({
               #{{ id }}
             </p>
 
-            <!-- <p class="font-bold uppercase">#{{ currentInvoice.invoiceId }}</p> -->
+            <h3 class="text-xs text-primary dark:text-primary/50 lg:text-base">Fecha</h3>
 
-            <h3 class="text-[9px] text-primary dark:text-primary/50 lg:text-base">Fecha</h3>
-            <!-- <p class="dark:text-light text-[10px] text-dark-medium dark:text-light-strong">Fecha</p> -->
             <p class="dark:text-light-strongm text-[10px] text-dark-medium dark:text-light-strong">
               {{ currentInvoice?.invoiceDate }}
             </p>
 
-            <h3 class="text-[9px] text-primary dark:text-primary/50 lg:text-base">Vigencia</h3>
-            <!-- <p class="dark:text-light text-[10px] text-dark-medium dark:text-light-strong">
-              Vigencia
-            </p> -->
+            <h3 class="text-xs text-primary dark:text-primary/50 lg:text-base">Vigencia</h3>
+
             <p class="dark:text-light text-[10px] text-dark-medium dark:text-light-strong">
               {{
                 new Date(currentInvoice?.paymentDueDate as Date).toLocaleDateString(
@@ -293,12 +287,8 @@ definePageMeta({
               }}
             </p>
 
-            <h3 class="text-[9px] text-primary dark:text-primary/50 lg:text-base">
-              Tiempo de entrega
-            </h3>
-            <!-- <p class="dark:text-light text-[10px] text-dark-medium dark:text-light-strong">
-              Tiempo de entrega
-            </p> -->
+            <h3 class="text-xs text-primary dark:text-primary/50 lg:text-base">Entrega</h3>
+
             <p class="dark:text-light text-[10px] text-dark-medium dark:text-light-strong">
               {{ currentInvoice?.eta }}
             </p>
@@ -306,30 +296,28 @@ definePageMeta({
         </section>
 
         <!-- Customer information section -->
-        <section class="rounded-box pb-4">
+        <section class="pb-4">
           <h2
-            class="mx-auto mb-4 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong"
+            class="text-md mx-auto mb-4 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong lg:text-base"
           >
             Información del cliente
           </h2>
 
-          <ul
-            class="grid grid-cols-3 gap-4 px-4 text-[9px] print:grid-cols-5 lg:grid-cols-5 lg:px-8"
-          >
+          <ul class="grid grid-cols-3 gap-4 px-4 text-xs print:grid-cols-5 lg:grid-cols-5 lg:px-8">
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Nombre
               </h3>
               <p
-                class="text-[8px] capitalize text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[10px] capitalize text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
                 <!-- Nombre -->
                 {{ currentInvoice?.clientName }}
               </p>
               <p
-                class="text-[8px] capitalize text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[10px] capitalize text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
                 <!-- Nombre 2 -->
                 {{ currentInvoice?.clientName2 }}
@@ -337,12 +325,12 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Empresa
               </h3>
               <p
-                class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[10px] text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
                 <!-- Empresa -->
                 {{ currentInvoice?.clientCompany }}
@@ -350,12 +338,12 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Forma de pago
               </h3>
               <p
-                class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[10px] text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
                 <!-- Forma de pago -->
                 {{ currentInvoice?.paymentType }}
@@ -363,12 +351,12 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Moneda
               </h3>
               <p
-                class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[10px] text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
                 <!-- Moneda -->
                 {{ currentInvoice?.currencyType }}
@@ -376,12 +364,12 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-[9px] text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
               >
                 Tipo de cambio
               </h3>
               <p
-                class="text-[8px] text-dark-strong dark:text-light-strong print:text-[8px] lg:text-xs"
+                class="text-[10px] text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
                 <!-- Exchange -->
                 {{ currentInvoice?.exchangeCost ? '$' : ''
@@ -394,12 +382,11 @@ definePageMeta({
 
       <!-- Items table -->
       <section
-        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[240px] overflow-x-auto bg-white shadow-pinterest dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
+        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[240px] overflow-x-auto border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
       >
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
         >
-          <!-- <h5 class="w-6 py-2 font-bold text-primary">ID</h5> -->
           <div class="w-72 print:w-7/12 lg:basis-5/12">
             <h5 class="w-full py-2 font-bold text-primary dark:text-primary/50">Descripción</h5>
           </div>
@@ -430,14 +417,14 @@ definePageMeta({
         >
           <div class="w-72 print:w-7/12 lg:basis-5/12">
             <p
-              class="w-full overflow-x-hidden py-2 text-left text-dark-strong dark:text-light-strong print:text-[8px]"
+              class="w-full overflow-x-hidden py-2 text-left text-dark-strong dark:text-light-strong print:text-[10px]"
             >
               <!-- Nombre del item -->
-              {{ item.itemName || 'Articulo sin descripcion' }}
+              {{ item.itemName || 'Artículo sin descripcion' }}
             </p>
           </div>
           <p
-            class="py-2 text-center text-dark-strong dark:text-light-strong print:w-1/12 print:basis-1/12 print:text-[8px] lg:basis-[10%]"
+            class="py-2 text-center text-dark-strong dark:text-light-strong print:w-1/12 print:basis-1/12 print:text-[10px] lg:basis-[10%]"
           >
             <!-- Condicion -->
             {{ item.condition }}
@@ -472,7 +459,7 @@ definePageMeta({
       <!-- Items mobile -->
       <section class="mt-4 print:hidden lg:hidden">
         <h3
-          class="mx-auto mb-4 w-fit border-b-2 border-primary text-center text-xl text-dark-medium dark:text-light-medium"
+          class="mx-auto mb-4 w-fit border-b-2 border-primary text-center text-base text-dark-medium dark:text-light-medium"
         >
           Artículos
         </h3>
@@ -481,8 +468,8 @@ definePageMeta({
         >
           <div class="carousel-item" v-for="(item, index) in invoiceItemList" :key="index">
             <div class="card bg-base-100 shadow-xl dark:bg-dark-medium">
-              <div class="card-body text-sm">
-                <h2 class="card-title w-52 text-sm text-dark-medium dark:text-light-medium">
+              <div class="card-body text-xs">
+                <h2 class="card-title w-52 text-[12px] text-dark-medium dark:text-light-medium">
                   {{ item.itemName || 'Articulo sin descripcion' }}
                 </h2>
                 <p class="text-dark-medium dark:text-light-medium">
@@ -504,7 +491,7 @@ definePageMeta({
                 </p>
                 <div class="card-actions items-center">
                   <button
-                    class="btn flex gap-2 border-light-strong bg-white text-primary dark:border-dark-medium dark:bg-dark-strong"
+                    class="btn flex gap-2 border-light-strong bg-white text-xs text-primary hover:border-light-strong hover:bg-transparent dark:border-dark-medium dark:bg-dark-strong"
                   >
                     <span class="text-dark-medium dark:text-light-medium">Importe: </span>
                     <span>
@@ -527,7 +514,7 @@ definePageMeta({
         class="flex w-full flex-col-reverse gap-4 overflow-y-hidden py-4 print:flex-row lg:flex-row"
       >
         <section
-          class="flex w-full flex-col gap-4 overflow-y-hidden rounded-[0.75rem] bg-white px-6 py-4 shadow-pinterest dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:border print:border-light-strong print:pr-0 print:shadow-none lg:w-4/5 lg:flex-row"
+          class="rounded-box flex w-full flex-col gap-4 overflow-y-hidden border border-light-strong bg-white px-6 py-4 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:border print:border-light-strong print:pr-0 print:shadow-none lg:w-4/5 lg:flex-row"
         >
           <div class="overflow-y-hidden print:w-2/5 lg:w-1/2">
             <h3
@@ -559,7 +546,7 @@ definePageMeta({
           </div>
         </section>
         <section
-          class="flex w-full basis-[30%] flex-col justify-center rounded-[0.75rem] bg-white px-6 py-4 shadow-pinterest dark:bg-dark-strong print:basis-[30%] print:border print:border-light-strong print:px-4 print:text-xs print:shadow-none lg:w-1/5"
+          class="rounded-box flex w-full basis-[30%] flex-col justify-center border border-light-strong bg-white px-6 py-4 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:basis-[30%] print:border print:border-light-strong print:px-4 print:text-xs print:shadow-none lg:w-1/5"
         >
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
@@ -708,7 +695,7 @@ definePageMeta({
   .header,
   .invoice-details {
     // background-color: #fff;
-    border-radius: 0.75rem;
+    @apply rounded-box;
   }
 
   .header {

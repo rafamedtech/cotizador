@@ -10,7 +10,6 @@ const { invoices } = await useInvoices();
 const filterMenu = ref(true);
 const filteredInvoices = ref([]);
 
-// invoicesLoaded.value = true;
 filteredInvoices.value = invoices.value;
 
 onMounted(() => {
@@ -65,37 +64,7 @@ const invoiceBtn = ref(null);
 
 const newInvoice = () => {
   return navigateTo('nueva-cotizacion');
-
-  // const html = document.querySelector('html');
-  // html.style.overflowY = 'hidden';
 };
-
-// function filterInvoices(status) {
-//   filterResults.value = true;
-//   invoicesLoaded.value = false;
-
-//   isLoading.value = true;
-//   setTimeout(() => {
-//     if (status === 'Todas') {
-//       invoices.value = [...invoiceData.value];
-//     } else {
-//       invoices.value = [
-//         ...invoiceData.value.filter((invoice) => {
-//           return invoice.status === status;
-//         }),
-//       ];
-//     }
-
-//     isLoading.value = false;
-//     invoicesLoaded.value = true;
-
-//     if (invoices.value.length === 0) {
-//       filterResults.value = false;
-//     } else {
-//       filterResults.value = true;
-//     }
-//   }, 1000);
-// }
 
 definePageMeta({
   middleware: ['auth'],
@@ -137,69 +106,6 @@ definePageMeta({
         <!-- Search box -->
         <section class="flex w-full items-center justify-between">
           <SearchBar @@search="searchInvoices($event)" @@clear="searchCleared" />
-
-          <!-- <div class="dropdown-bottom dropdown-end dropdown">
-            <span class="text-dark-strong dark:text-light-medium">{{ filterStatus }}</span>
-            <Icon
-              size="32"
-              tabindex="0"
-              name="mdi:dots-vertical"
-              class="cursor-pointer text-dark-medium dark:text-light-medium"
-            />
-
-            <ul
-              tabindex="0"
-              class="dark dropdown-content menu rounded-box w-52 bg-white p-2 text-dark-strong shadow dark:bg-dark-strong dark:text-light-medium"
-            >
-              <span class="py-2 pl-2 italic text-primary">Filtrar por etapa</span>
-              <li class="cursor-pointer hover:text-primary">
-                <label @click="filterInvoices('Todas')"> Todas </label>
-                <input
-                  class="hidden"
-                  type="radio"
-                  name="filterStatus"
-                  value="Todas"
-                  v-model="filterStatus"
-                />
-              </li>
-              <li class="hover:text-primary">
-                <label @click="filterInvoices('Vendida')">
-                  <input
-                    class="hidden"
-                    type="radio"
-                    name="filterStatus"
-                    value="Vendidas"
-                    v-model="filterStatus"
-                  />
-                  Vendidas
-                </label>
-              </li>
-              <li class="hover:text-primary">
-                <label @click="filterInvoices('Borrador')">
-                  <input
-                    class="hidden"
-                    type="radio"
-                    name="filterStatus"
-                    value="Borrador"
-                    v-model="filterStatus"
-                  />
-                  Borrador
-                </label>
-              </li>
-              <li class="hover:text-primary">
-                <label @click="filterInvoices('Pendiente')">
-                  <input
-                    class="hidden"
-                    type="radio"
-                    name="filterStatus"
-                    value="Pendiente"
-                    v-model="filterStatus"
-                  />
-                  Pendiente
-                </label>
-              </li>
-            </ul>
-          </div> -->
         </section>
 
         <section
@@ -253,7 +159,5 @@ definePageMeta({
       <!-- If no invoices -->
       <NoInvoices v-if="invoices.length === 0 && invoicesLoaded && !isLoading" />
     </div>
-
-    <!-- <NewInvoiceModal /> -->
   </div>
 </template>

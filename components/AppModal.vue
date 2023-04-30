@@ -3,14 +3,7 @@ import { Modal } from '@/types/modal';
 
 const store = useStore();
 const { modalType, backBtn, isLoading } = storeToRefs(store);
-
 const { userLogout } = useAuthStore();
-
-// const route = useRoute();
-// const { id }: any = route.params;
-// const { currentInvoice } = await useInvoice(id.toString());
-
-const router = useRouter();
 
 const modalText = computed(() => {
   switch (modalType.value) {
@@ -49,6 +42,7 @@ async function onAction() {
       await navigateTo('/cotizaciones');
       break;
     case Modal.DiscardEdit:
+      const router = useRouter();
       backBtn.value?.click();
       router.back();
       break;
