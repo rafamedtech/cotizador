@@ -1,20 +1,25 @@
-<script setup>
-import logo from '@/assets/images/Suntech-logo-cropped.png';
+<script lang="ts" setup>
+import { Modal } from '@/types/modal';
 
 const store = useStore();
-const { modalType } = storeToRefs(store);
+const { modalType, backBtn } = storeToRefs(store);
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
 
-const modalBtn = ref(null);
+// const modalBtn = ref<HTMLInputElement | null>(null);
 const mobileMenu = ref(false);
 function toggleMenu() {
   mobileMenu.value = !mobileMenu.value;
 }
 
 const userLogout = () => {
-  modalType.value = 'Cerrar Sesión';
-  modalBtn.value.click();
+  // modalType.value = Modal.Logout;
+  store.$patch({
+    modalType: Modal.Logout,
+  });
+  setTimeout(() => {
+    backBtn.value?.click();
+  }, 500);
 };
 </script>
 
@@ -24,18 +29,21 @@ const userLogout = () => {
   >
     <section class="flex w-full items-center justify-between px-2 lg:block lg:w-auto">
       <div class="flex h-16 w-fit items-center justify-center rounded-[10px] p-4 pt-6 lg:w-full">
-        <img :src="logo" alt="" class="h-full w-auto" />
+        <img src="@/assets/images/Suntech-logo-cropped.png" alt="" class="h-full w-auto" />
       </div>
-      <div class="lg:hidden">
-        <button @click="userLogout" class="flex cursor-pointer flex-col items-center gap-2">
-          <label ref="modalBtn" for="my-modal-6" class="hidden"></label>
-          <Icon
-            name="material-symbols:logout-rounded"
-            class="text-3xl text-primary dark:text-primary/50"
-          />
-          <p class="text-xs dark:text-light-medium">Cerrar sesión</p>
-        </button>
-      </div>
+      <button
+        type="button"
+        @click="userLogout"
+        class="flex cursor-pointer flex-col items-center gap-2 lg:hidden"
+      >
+        <label ref="modalBtn" for="my-modal-6" class="hidden"></label>
+        <Icon
+          name="material-symbols:logout-rounded"
+          class="text-3xl text-primary dark:text-primary/50"
+        />
+        <p class="text-xs dark:text-light-medium">Cerrar sesión</p>
+      </button>
+
       <div class="hidden lg:divider"></div>
       <section class="nav-links hidden flex-col lg:flex">
         <NuxtLink
@@ -73,7 +81,11 @@ const userLogout = () => {
           <p class="text-xs dark:text-light-medium">{{ isDark ? 'Light' : 'Dark' }} Mode</p>
         </button>
       </ClientOnly>
-      <button @click="userLogout" class="flex cursor-pointer flex-col items-center gap-2">
+      <button
+        type="button"
+        @click="userLogout"
+        class="flex cursor-pointer flex-col items-center gap-2"
+      >
         <label ref="modalBtn" for="my-modal-6" class="hidden"></label>
         <Icon
           name="material-symbols:logout-rounded"

@@ -376,20 +376,15 @@ function discardInvoice() {
             <label for="paymentDueDate" class="dark:text-light-strong"
               >Fecha de vencimiento<span class="text-red-500">*</span></label
             >
-            <!-- <input
-                    type="number"
-                    id="paymentDueDate"
-                    class="input-primary input w-full bg-light-medium"
-                    v-model="invoiceObject.paymentTerms"
-                  /> -->
-
-            <VueDatepickerUi
-              v-model="invoiceObject.paymentDueDate"
-              lang="es"
-              placeholder="Selecciona fecha"
-              position="right"
-              :date-format="dateOptions"
-            />
+            <ClientOnly>
+              <VueDatepickerUi
+                v-model="invoiceObject.paymentDueDate"
+                lang="es"
+                placeholder="Selecciona fecha"
+                position="right"
+                :date-format="dateOptions"
+              />
+            </ClientOnly>
             <label class="label">
               <span class="label-text-alt text-red-500" v-if="v$.paymentDueDate.$error">{{
                 v$.paymentDueDate.$errors[0].$message
