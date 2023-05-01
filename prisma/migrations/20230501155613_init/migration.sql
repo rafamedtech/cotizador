@@ -39,8 +39,5 @@ CREATE TABLE "InvoiceItem" (
     CONSTRAINT "InvoiceItem_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Invoice_invId_key" ON "Invoice"("invId");
-
 -- AddForeignKey
 ALTER TABLE "InvoiceItem" ADD CONSTRAINT "InvoiceItem_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
