@@ -142,7 +142,6 @@ definePageMeta({
         </TransitionGroup>
 
         <!-- No filter results -->
-
         <div
           v-if="
             filteredInvoices.length === 0 && invoices.length > 0 && !isLoading && !filterResults

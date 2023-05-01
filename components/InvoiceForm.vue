@@ -239,7 +239,7 @@ async function onSubmit() {
     }
 
     await uploadInvoice();
-    await navigateTo('/');
+    await navigateTo('/cotizaciones');
   } else {
     isLoading.value = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -929,7 +929,7 @@ label {
 
 .v-calendar .input-field input {
   /* @apply input-bordered input pl-10;  */
-  @apply input w-full bg-light-medium dark:bg-dark-medium;
+  @apply input w-full border-light-strong bg-light-medium dark:bg-dark-medium;
   /* border-color: v-bind(errorBorder); */
   padding-left: 2rem;
   padding-right: 0;

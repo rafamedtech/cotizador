@@ -8,7 +8,14 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-icon', '@vueuse/nuxt', '@nuxtjs/supabase'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+    'nuxt-icon',
+    '@vueuse/nuxt',
+    '@nuxtjs/supabase',
+    '@kevinmarrec/nuxt-pwa',
+  ],
 
   pinia: {
     autoImports: ['storeToRefs'],
@@ -16,5 +23,14 @@ export default defineNuxtConfig({
 
   imports: {
     dirs: ['stores'],
+  },
+
+  pwa: {
+    manifest: {
+      name: 'Cotizador',
+      short_name: 'Cotizador',
+      theme_color: '#ffffff',
+      lang: 'es',
+    },
   },
 });

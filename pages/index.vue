@@ -1,7 +1,8 @@
 <template>
   <main class="custom-container grid w-full place-content-center pb-[8rem]">
+    <h1 class="text-2xl text-primary dark:text-primary/50 lg:text-3xl">Inicio</h1>
     <div
-      class="stats stats-vertical mb-4 border border-light-strong shadow-pinterest lg:stats-horizontal dark:border-dark-medium dark:bg-dark-strong"
+      class="stats stats-vertical my-4 border border-light-strong shadow-pinterest lg:stats-horizontal dark:border-dark-medium dark:bg-dark-strong"
     >
       <div class="stat place-items-center">
         <div class="stat-title text-primary dark:text-primary/50">Total</div>
