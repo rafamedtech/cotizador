@@ -928,7 +928,7 @@ label {
 }
 
 .v-calendar .input-field input {
-  @apply input-bordered input w-full border-light-strong bg-light-medium dark:bg-dark-medium;
+  @apply input-bordered input w-full border-light-strong bg-light-medium text-[0.9rem] dark:bg-dark-medium;
   padding-left: 2rem;
   padding-right: 0;
   width: 2rem !important;
