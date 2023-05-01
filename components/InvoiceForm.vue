@@ -380,7 +380,7 @@ function discardInvoice() {
               <VueDatepickerUi
                 v-model="invoiceObject.paymentDueDate"
                 lang="es"
-                placeholder="Selecciona fecha"
+                placeholder="Elige fecha"
                 position="right"
                 :date-format="dateOptions"
               />
