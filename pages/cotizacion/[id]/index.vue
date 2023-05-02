@@ -212,29 +212,29 @@ definePageMeta({
     <!-- Cover -->
 
     <div
-      class="relative mb-8 h-fit rounded-[20px] bg-white shadow-lg print:hidden lg:print:h-screen lg:print:w-screen"
+      class="relative mb-8 h-[200px] rounded-[20px] bg-white shadow-lg lg:print:h-[200px] lg:print:w-screen"
       :class="{ hidden: user }"
     >
-      <!-- <picture>
+      <picture>
         <source media="(max-width: 767px)" srcset="@/assets/images/cover.jpg" />
         <img
           src="@/assets/images/cover.jpg"
           srcset="@/assets/images/cover.jpg"
           alt=""
-          class="rounded-[20px]"
+          class="h-full w-full rounded-[20px] object-cover"
         />
-      </picture> -->
+      </picture>
     </div>
     <div
-      class="relative mb-8 hidden h-fit bg-white print:hidden print:h-[700px] print:items-center print:justify-center"
+      class="relative mb-8 hidden h-fit bg-white print:h-[700px] print:items-center print:justify-center"
     >
-      <!-- <figure class="h-full">
+      <figure class="h-full">
         <img
           class="h-auto w-full rounded-[20px]"
           src="@/assets/images/cover.jpg"
           alt="cover image"
         />
-      </figure> -->
+      </figure>
     </div>
 
     <!-- Invoice body -->
@@ -382,7 +382,7 @@ definePageMeta({
 
       <!-- Items table -->
       <section
-        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[240px] overflow-x-auto border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
+        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[220px] overflow-x-auto border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
       >
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
