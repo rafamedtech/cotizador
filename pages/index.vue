@@ -1,15 +1,4 @@
 <script lang="ts" setup>
-import { Bar } from 'vue-chartjs';
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from 'chart.js';
-
 const { invoices } = await useInvoices();
 const vendidas = computed(() => invoices.value.filter((invoice) => invoice.status === 'Vendida'));
 const pendientes = computed(() =>
@@ -44,18 +33,6 @@ const uniqueContacts = ref(
 );
 
 const filteredContacts = ref([]);
-
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
-const chartData = reactive({
-  labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
-  datasets: [
-    {
-      label: 'Cotizaciones',
-      backgroundColor: '#fe6847',
-      data: [40, 20, 12, 15, 25, 30],
-    },
-  ],
-});
 
 definePageMeta({
   middleware: ['auth'],
