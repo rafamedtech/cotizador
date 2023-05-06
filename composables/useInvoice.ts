@@ -7,14 +7,14 @@ export const useInvoice = async (id?: string) => {
 
   const currentInvoice = ref<InvoiceWithItems | null | undefined>(null);
   async function getCurrentInvoice(id: string) {
-    const { data, error } = await useFetch<InvoiceWithItems>(`/api/cotizacion/${id}`);
+    const data = await useFetchWithCache<InvoiceWithItems>(`/api/cotizacion/${id}`);
 
-    if (error.value) {
-      throw createError({
-        ...error.value,
-        statusMessage: 'Could not fetch data',
-      });
-    }
+    // if (error.value) {
+    //   throw createError({
+    //     ...error.value,
+    //     statusMessage: 'Could not fetch data',
+    //   });
+    // }
 
     currentInvoice.value = data.value as InvoiceWithItems;
   }
@@ -24,8 +24,11 @@ export const useInvoice = async (id?: string) => {
   }
 
   // - Create new invoice
+  const { getInvoices } = await useInvoices();
   async function newInvoice(invoice: InvoiceDraft) {
     isLoading.value = true;
+    sessionStorage.setItem('/api/invoices', JSON.stringify(null));
+
     try {
       await $fetch(`/api/cotizacion/new`, {
         method: 'POST',
@@ -34,6 +37,8 @@ export const useInvoice = async (id?: string) => {
           invoice,
         },
       });
+
+      await getInvoices();
 
       setTimeout(() => {
         isLoading.value = false;
@@ -122,6 +127,7 @@ export const useInvoice = async (id?: string) => {
   // - Delete currentInvoice
   async function deleteInvoiceOnDb(id: number | undefined) {
     isLoading.value = true;
+    sessionStorage.setItem('/api/invoices', JSON.stringify(null));
     try {
       await $fetch(`/api/cotizacion/${id}/delete`, {
         method: 'DELETE',
@@ -129,6 +135,8 @@ export const useInvoice = async (id?: string) => {
           id,
         },
       });
+
+      await getInvoices();
 
       setTimeout(() => {
         isLoading.value = false;

@@ -113,10 +113,13 @@ definePageMeta({
 
 <template>
   <main
-    class="relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pt-2 pb-24 print:px-10 lg:px-10 lg:pb-6"
+    class="custom-container relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pt-2 pb-24 print:px-10 lg:px-10 lg:pb-6"
   >
     <div v-if="currentInvoice && user" class="invoice-view my-container mb-4 print:hidden">
-      <NuxtLink class="nav-link flex gap-2" :to="{ name: 'cotizaciones' }">
+      <NuxtLink
+        class="nav-link absolute -top-2 flex gap-2 md:relative lg:absolute lg:top-2"
+        :to="{ name: 'cotizaciones' }"
+      >
         <Icon class="text-2xl text-primary" name="heroicons-solid:arrow-left" />
         <span class="text-dark-medium dark:text-light-strong">Regresar</span>
       </NuxtLink>

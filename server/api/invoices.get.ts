@@ -7,6 +7,7 @@ export default defineEventHandler((event) => {
   // protectRoute(event);
   return prisma.invoice.findMany({
     select: {
+      createdAt: true,
       invId: true,
       invoiceDate: true,
       clientCompany: true,
@@ -19,7 +20,7 @@ export default defineEventHandler((event) => {
     },
     orderBy: [
       {
-        invId: 'desc',
+        createdAt: 'desc',
       },
     ],
   });

@@ -33,7 +33,7 @@ const invoiceTitle = computed(() => {
 const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
 const invoiceObject = reactive<InvoiceDraft>({
-  invId: (invoices.value.length + 1).toString(),
+  invId: invoices.value ? (invoices.value?.length + 1).toString() : '0',
   clientCompany: '',
   clientName: '',
   clientName2: '',
@@ -122,12 +122,12 @@ const rules = computed(() => {
   return {
     paymentDueDate: {
       required: helpers.withMessage('Es necesario ingresar una fecha', required),
-      minValue: helpers.withMessage('La fecha mínima es al día siguiente', (value) => {
-        return (
-          new Date(value as Date).toLocaleString('es-MX', dateOptions) >
-          new Date().toLocaleString('es-MX', dateOptions)
-        );
-      }),
+      // minValue: helpers.withMessage('La fecha mínima es al día siguiente', (value) => {
+      //   return (
+      //     new Date(value as Date).toLocaleString('es-MX', dateOptions) >
+      //     new Date().toLocaleString('es-MX', dateOptions)
+      //   );
+      // }),
     },
     clientCompany: { required: helpers.withMessage('Este campo es obligatorio', required) },
     clientName: { required: helpers.withMessage('Este campo es obligatorio', required) },
@@ -897,10 +897,6 @@ function discardInvoice() {
 </template>
 
 <style>
-/* ::-webkit-scrollbar-track {
-  @apply my-2 rounded-xl;
-} */
-
 .v-calendar .input-field svg.datepicker {
   @apply fill-primary dark:fill-primary/50;
 }

@@ -4,17 +4,18 @@ export const useInvoices = async () => {
   const store = useStore();
   const { contactData } = storeToRefs(store);
 
-  const invoices = ref<InvoiceOutline[]>([]);
+  const invoices = ref<InvoiceOutline[] | null>([]);
 
   async function getInvoices() {
-    const { data, error } = await useFetch<InvoiceOutline[]>('/api/invoices');
+    const data = await useFetchWithCache<InvoiceOutline[]>('/api/invoices');
+    // const { data, error } = await useFetch<InvoiceOutline[]>('/api/invoices');
 
-    if (error.value) {
-      throw createError({
-        ...error.value,
-        statusMessage: 'Could not fetch data',
-      });
-    }
+    // if (error.value) {
+    //   throw createError({
+    //     ...error.value,
+    //     statusMessage: 'Could not fetch data',
+    //   });
+    // }
 
     invoices.value = data.value as InvoiceOutline[];
 

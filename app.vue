@@ -4,9 +4,11 @@ const { isLoadingFull, openAlert } = storeToRefs(store);
 </script>
 
 <template>
-  <main class="relative">
+  <main class="relative transition-all">
     <NuxtLayout>
-      <NuxtPage />
+      <Transition name="slide" appear>
+        <NuxtPage />
+      </Transition>
     </NuxtLayout>
 
     <ScreenLoader v-if="isLoadingFull" />
@@ -36,7 +38,8 @@ const { isLoadingFull, openAlert } = storeToRefs(store);
   margin: 0 auto;
 
   @media (min-width: 768px) {
-    padding-left: 100px;
+    // padding-left: 228px;
+    padding-left: calc(8rem + 100px);
     padding-right: 100px;
   }
 

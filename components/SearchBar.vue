@@ -49,6 +49,7 @@ watch(searchQuery, () => {
 // Filter contacts end
 
 function clearSearch() {
+  contactsModal.value = false;
   if (searchQuery.value === '' && filterQuery.value === 'Todas') {
     return;
   }
@@ -59,6 +60,11 @@ function clearSearch() {
 }
 
 const searchInputs = ref(false);
+
+const search = ref(null);
+function toggleSearch() {
+  searchInputs.value = !searchInputs.value;
+}
 </script>
 
 <template>
@@ -80,12 +86,13 @@ const searchInputs = ref(false);
           "
           size="32"
           class="cursor-pointer text-primary"
-          @click="searchInputs = !searchInputs"
+          @click="toggleSearch"
         />
       </label>
       <div v-if="searchInputs">
         <div class="relative lg:w-1/2">
           <input
+            ref="search"
             v-model="searchQuery"
             @focus="contactsModal = true"
             @input="filterContacts"
@@ -143,6 +150,7 @@ const searchInputs = ref(false);
               class="mt-4 flex w-full flex-row-reverse justify-start gap-2 lg:mt-0 lg:flex-row lg:justify-between"
             >
               <button
+                type="submit"
                 class="btn-primary btn text-light-medium hover:border-primary/50 hover:bg-primary/50 dark:border-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
               >
                 <svg

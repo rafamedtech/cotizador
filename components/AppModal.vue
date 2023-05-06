@@ -83,29 +83,31 @@ const actionBtnText = computed(() => {
 </script>
 
 <template>
-  <input type="checkbox" id="my-modal-6" class="modal-toggle" />
+  <div>
+    <input type="checkbox" id="my-modal-6" class="modal-toggle" />
 
-  <div class="modal modal-bottom sm:modal-middle print:hidden">
-    <div class="modal-box dark:bg-dark-medium">
-      <h3 class="text-lg font-bold text-primary dark:text-primary/50">{{ modalType }}</h3>
-      <p class="py-4 text-dark-medium dark:text-light-medium">{{ modalText }}</p>
-      <div class="modal-action">
-        <label ref="backBtn" for="my-modal-6" class="hidden"></label>
-        <button
-          v-if="modalType !== Modal.Email"
-          @click="toggleModal"
-          class="btn bg-dark-strong hover:bg-dark-medium hover:text-primary lg:w-32"
-        >
-          Regresar
-        </button>
-        <button
-          class="btn-primary btn cursor-pointer bg-primary text-light-medium hover:bg-primary/50 dark:bg-primary/50 dark:hover:bg-primary lg:w-32"
-          @click="onAction"
-        >
-          <label for="my-modal-6" class="hidden"></label>
-          <LoadingSpinner v-if="isLoading" />
-          <span v-else>{{ actionBtnText }}</span>
-        </button>
+    <div class="modal modal-bottom sm:modal-middle print:hidden">
+      <div class="modal-box dark:bg-dark-medium">
+        <h3 class="text-lg font-bold text-primary dark:text-primary/50">{{ modalType }}</h3>
+        <p class="py-4 text-dark-medium dark:text-light-medium">{{ modalText }}</p>
+        <div class="modal-action">
+          <label ref="backBtn" for="my-modal-6" class="hidden"></label>
+          <button
+            v-if="modalType !== Modal.Email"
+            @click="toggleModal"
+            class="btn bg-dark-strong hover:bg-dark-medium hover:text-primary lg:w-32"
+          >
+            Regresar
+          </button>
+          <button
+            class="btn-primary btn cursor-pointer bg-primary text-light-medium hover:bg-primary/50 dark:bg-primary/50 dark:hover:bg-primary lg:w-32"
+            @click="onAction"
+          >
+            <label for="my-modal-6" class="hidden"></label>
+            <LoadingSpinner v-if="isLoading" />
+            <span v-else>{{ actionBtnText }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

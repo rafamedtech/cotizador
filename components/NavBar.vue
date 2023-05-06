@@ -25,16 +25,16 @@ const userLogout = () => {
 
 <template>
   <header
-    class="z-[99] flex w-full justify-between bg-dark-medium shadow-sm dark:bg-dark-strong print:hidden md:fixed md:max-h-screen md:min-w-[80px] md:flex-col lg:min-h-full lg:w-32 lg:shadow-lg"
+    class="z-[99] flex w-full justify-between bg-dark-medium shadow-sm dark:bg-dark-strong print:hidden md:fixed md:max-h-screen md:min-h-full md:w-32 md:min-w-[80px] md:flex-col md:shadow-lg"
   >
-    <section class="flex w-full items-center justify-between px-2 lg:block lg:w-auto">
+    <section class="flex w-full items-center justify-between px-2 md:block lg:w-auto">
       <div class="flex h-16 w-fit items-center justify-center rounded-[10px] p-4 pt-6 lg:w-full">
         <img src="@/assets/images/Suntech-logo-cropped.png" alt="" class="h-full w-auto" />
       </div>
       <button
         type="button"
         @click="userLogout"
-        class="flex cursor-pointer flex-col items-center gap-2 lg:hidden"
+        class="flex cursor-pointer flex-col items-center gap-2 md:hidden"
       >
         <label ref="modalBtn" for="my-modal-6" class="hidden"></label>
         <Icon
@@ -44,8 +44,8 @@ const userLogout = () => {
         <p class="text-xs dark:text-light-medium">Cerrar sesión</p>
       </button>
 
-      <div class="hidden lg:divider"></div>
-      <section class="nav-links hidden flex-col lg:flex">
+      <div class="hidden md:divider"></div>
+      <section class="nav-links hidden flex-col md:flex">
         <NuxtLink
           :to="{ name: 'index' }"
           class="mb-8 flex cursor-pointer flex-col items-center gap-2"
@@ -65,7 +65,7 @@ const userLogout = () => {
       </section>
     </section>
 
-    <div class="hidden items-center gap-4 lg:mb-8 lg:flex lg:flex-col">
+    <div class="hidden items-center gap-4 md:flex md:flex-col lg:mb-8">
       <div class="divider"></div>
       <ClientOnly>
         <button @click="toggleDark()" class="flex flex-col items-center gap-2">
@@ -97,7 +97,7 @@ const userLogout = () => {
 
     <!-- Mobile menu -->
 
-    <div class="btm-nav bg-dark-strong pt-1 lg:hidden">
+    <div class="btm-nav bg-dark-strong pt-1 md:hidden">
       <NuxtLink :to="{ name: 'index' }">
         <Icon
           name="material-symbols:home-outline-rounded"
