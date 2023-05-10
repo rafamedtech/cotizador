@@ -23,7 +23,6 @@ const user = useSupabaseUser();
   left: 0;
   right: 0;
   transition: all 0.3s linear;
-  @apply top-[40px] lg:top-0;
 }
 
 .page-left-enter-from,
