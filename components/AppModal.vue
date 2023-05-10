@@ -19,6 +19,7 @@ const modalText = computed(() => {
       return 'La cotización fue enviada exitósamente';
     case Modal.Pdf:
       return 'Asegúrate de elegir "Guardar como PDF" en el destino.';
+
     default:
       '';
   }
@@ -65,6 +66,7 @@ async function onAction() {
       toggleModal();
       window.print();
       break;
+
     default:
       return;
   }

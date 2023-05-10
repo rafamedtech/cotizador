@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 h-screen w-screen transition-all">
-    <div class="relative h-full">
+    <div class="relative h-full backdrop-blur-sm">
       <div class="blur-background absolute inset-0"></div>
       <div class="loading">
         <div>

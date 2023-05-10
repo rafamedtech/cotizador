@@ -2,19 +2,39 @@
 // Imports
 import emailjs from '@emailjs/browser';
 import { Modal } from '@/types/modal';
+import type { InvoiceWithItems, InvoiceItems } from '@/types/invoice';
 
 // Definitions
 const { params } = useRoute();
 const store = useStore();
 
 const { id }: any = params;
-const { currentInvoice, updateStatusOnDb } = await useInvoice(id);
-const invoiceItemList = currentInvoice.value?.invoiceItems;
+const { updateStatusOnDb } = await useInvoice();
+// const { currentInvoice, updateStatusOnDb } = await useInvoice(id);
+const currentInvoice = ref<InvoiceWithItems | null>(null);
+
+// const invoiceItemList = currentInvoice.value?.invoiceItems;
+const invoiceItemList = ref<InvoiceItems[] | null>(null);
 
 const { isLoading, isLoadingFull, backBtn, modalType } = storeToRefs(store);
 const user = useSupabaseUser();
 
-isLoadingFull.value = false;
+// onBeforeMount(() => {
+// });
+// isLoadingFull.value = false;
+
+// watchEffect(() => {
+//   if (currentInvoice.value) {
+//     isLoadingFull.value = false;
+//   }
+// });
+
+onMounted(async () => {
+  const { currentInvoice: invoiceCurrent } = await useInvoice(id);
+  currentInvoice.value = invoiceCurrent.value as InvoiceWithItems;
+  invoiceItemList.value = currentInvoice.value?.invoiceItems;
+  isLoadingFull.value = false;
+});
 
 const dateOptions: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
@@ -88,32 +108,30 @@ async function changeStatus(status: string) {
 
 const invoiceBtn = ref<HTMLInputElement | null>(null);
 
-definePageMeta({
-  // middleware: async function ({ params }, from) {
-  //   const { currentInvoice, getCurrentInvoice } = await useInvoice(params.id as any);
-
-  //   await getCurrentInvoice(params.id as any);
-
-  //   if (!currentInvoice.value) {
-  //     return abortNavigation(
-  //       createError({
-  //         statusCode: 404,
-  //         message: 'No se encontro la cotizacion',
-  //       })
-  //     );
-  //   }
-  // },
-
-  pageTransition: {
-    name: 'slide',
-    mode: 'out-in',
-  },
+useHead({
+  title: `Cotización #${id} | Suntech Cotizador`,
 });
+
+// definePageMeta({
+// middleware: async function ({ params }, from) {
+//   const { currentInvoice, getCurrentInvoice } = await useInvoice(params.id as any);
+//   await getCurrentInvoice(params.id as any);
+//   if (!currentInvoice.value) {
+//     return abortNavigation(
+//       createError({
+//         statusCode: 404,
+//         message: 'No se encontro la cotizacion',
+//       })
+//     );
+//   }
+// },
+
+// });
 </script>
 
 <template>
   <main
-    class="custom-container relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pt-2 pb-24 print:px-10 lg:px-10 lg:pb-6"
+    class="custom-container relative mx-auto min-h-screen w-full max-w-screen-lg px-4 pb-24 pt-2 print:px-10 lg:px-10 lg:pb-6"
   >
     <div v-if="currentInvoice && user" class="invoice-view my-container mb-4 print:hidden">
       <NuxtLink
@@ -125,7 +143,7 @@ definePageMeta({
       </NuxtLink>
       <!-- Header -->
       <div
-        class="header rounded-box flex flex-col gap-4 border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong lg:flex-row"
+        class="header rounded-box flex flex-col gap-4 border border-light-strong bg-white dark:border-dark-medium dark:bg-dark-strong lg:flex-row"
       >
         <div class="dropdown-bottom dropdown form-control relative mb-4 h-full w-1/2 items-end">
           <label class="label w-full text-center">
@@ -135,7 +153,7 @@ definePageMeta({
           <div class="w-full">
             <ul
               v-if="statusModal"
-              class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-lg border-light-strong bg-white shadow-lg transition-all dark:border dark:border-dark-strong dark:bg-dark-strong dark:text-light-strong"
+              class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-lg border border-light-strong bg-white shadow-lg transition-all dark:border dark:border-dark-strong dark:bg-dark-strong dark:text-light-strong"
             >
               <li
                 v-if="currentInvoice.status === 'Borrador'"
@@ -172,7 +190,7 @@ definePageMeta({
           <NuxtLink
             v-if="currentInvoice.status === 'Borrador' || currentInvoice.status === 'Pendiente'"
             :to="`/cotizacion/${currentInvoice.invId}/editar`"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:border-primary dark:border-dark-strong dark:bg-dark-medium dark:hover:border-primary/50 lg:text-[10px]"
           >
             <!-- @click="toggleEditInvoice" -->
             <Icon
@@ -184,7 +202,7 @@ definePageMeta({
           <label ref="backBtn" for="my-modal-6" class="hidden"></label>
           <button
             @click="deleteInvoice"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:border-primary dark:border-dark-strong dark:bg-dark-medium dark:hover:border-primary/50 lg:text-[10px]"
           >
             <Icon class="text-xl text-primary" name="icon-park-outline:delete" />
 
@@ -193,13 +211,13 @@ definePageMeta({
 
           <button
             @click="generatePDF"
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:border-primary dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong dark:hover:border-primary/50 lg:text-[10px]"
           >
             <Icon name="icon-park-outline:doc-detail" class="text-xl" />
             PDF
           </button>
           <button
-            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong lg:text-[10px]"
+            class="flex w-16 flex-col items-center justify-center gap-1 rounded-lg border border-light-strong bg-light-medium p-4 text-xs text-dark-medium transition-all hover:border-primary dark:border-dark-strong dark:bg-dark-medium dark:text-light-strong dark:hover:border-primary/50 lg:text-[10px]"
             @click="sendEmail"
           >
             <!-- <LoadingSpinner v-if="isLoading && modalType === Modal.Email" /> -->
@@ -243,7 +261,7 @@ definePageMeta({
     <!-- Invoice body -->
     <div id="pdf-content" class="w-full">
       <section
-        class="rounded-box border border-light-strong bg-white pt-4 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
+        class="rounded-box border border-light-strong bg-white pt-4 dark:border-dark-medium dark:bg-dark-strong print:border print:border-light-strong print:shadow-none"
       >
         <section class="relative flex h-full justify-between px-4 lg:px-8">
           <div class="mb-4 h-full w-1/2">
@@ -308,11 +326,7 @@ definePageMeta({
 
           <ul class="grid grid-cols-3 gap-4 px-4 text-xs print:grid-cols-5 lg:grid-cols-5 lg:px-8">
             <li class="text-center">
-              <h3
-                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
-              >
-                Nombre
-              </h3>
+              <h3 class="mb-2 text-xs text-primary dark:text-primary/50 lg:text-base">Nombre</h3>
               <p
                 class="text-[10px] capitalize text-dark-strong dark:text-light-strong print:text-[10px] lg:text-xs"
               >
@@ -328,7 +342,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
               >
                 Empresa
               </h3>
@@ -341,7 +355,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
               >
                 Forma de pago
               </h3>
@@ -354,7 +368,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
               >
                 Moneda
               </h3>
@@ -367,7 +381,7 @@ definePageMeta({
             </li>
             <li class="text-center">
               <h3
-                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:border-b lg:text-base"
+                class="mb-2 border-dark-strong text-xs text-primary dark:border-light-strong dark:text-primary/50 lg:text-base"
               >
                 Tipo de cambio
               </h3>
@@ -385,7 +399,7 @@ definePageMeta({
 
       <!-- Items table -->
       <section
-        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[220px] overflow-x-auto border border-light-strong bg-white shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
+        class="rounded-box relative mt-4 hidden max-h-[240px] min-h-[220px] overflow-x-auto border border-light-strong bg-white dark:border-dark-medium dark:bg-dark-strong print:block print:border print:border-light-strong print:shadow-none lg:block"
       >
         <div
           class="flex w-[150vw] justify-between gap-2 px-4 text-[10px] print:w-full lg:w-full lg:justify-between lg:gap-2 lg:px-8"
@@ -467,7 +481,7 @@ definePageMeta({
           Artículos
         </h3>
         <div
-          class="carousel-center carousel rounded-box max-w-md space-x-4 bg-light-strong p-4 shadow-pinterest dark:bg-dark-strong"
+          class="carousel-center carousel rounded-box max-w-md space-x-4 bg-light-strong p-4 dark:bg-dark-strong"
         >
           <div class="carousel-item" v-for="(item, index) in invoiceItemList" :key="index">
             <div class="card bg-base-100 shadow-xl dark:bg-dark-medium">
@@ -517,12 +531,10 @@ definePageMeta({
         class="flex w-full flex-col-reverse gap-4 overflow-y-hidden py-4 print:flex-row lg:flex-row"
       >
         <section
-          class="rounded-box flex w-full flex-col gap-4 overflow-y-hidden border border-light-strong bg-white px-6 py-4 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:border print:border-light-strong print:pr-0 print:shadow-none lg:w-4/5 lg:flex-row"
+          class="rounded-box flex w-full flex-col gap-4 overflow-y-hidden border border-light-strong bg-white px-6 py-4 dark:border-dark-medium dark:bg-dark-strong print:w-3/5 print:basis-4/5 print:flex-row print:border print:border-light-strong print:pr-0 print:shadow-none lg:w-4/5 lg:flex-row"
         >
           <div class="overflow-y-hidden print:w-2/5 lg:w-1/2">
-            <h3
-              class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong print:text-xs"
-            >
+            <h3 class="mb-2 w-fit text-primary dark:text-primary/50 print:text-xs">
               Condiciones del servicio
             </h3>
             <p
@@ -535,11 +547,7 @@ definePageMeta({
             </p>
           </div>
           <div class="w-1/2 print:w-2/5">
-            <h3
-              class="mb-2 w-fit border-b-2 border-primary text-dark-strong dark:border-primary/50 dark:text-light-strong print:text-xs"
-            >
-              Notas:
-            </h3>
+            <h3 class="mb-2 w-fit text-primary dark:text-primary/50 print:text-xs">Notas:</h3>
             <p
               class="h-12 w-[50ch] overflow-hidden text-[8px] uppercase italic text-dark-strong dark:text-light-strong print:w-full print:text-[6px]"
             >
@@ -549,7 +557,7 @@ definePageMeta({
           </div>
         </section>
         <section
-          class="rounded-box flex w-full basis-[30%] flex-col justify-center border border-light-strong bg-white px-6 py-4 shadow-pinterest dark:border-dark-medium dark:bg-dark-strong print:basis-[30%] print:border print:border-light-strong print:px-4 print:text-xs print:shadow-none lg:w-1/5"
+          class="rounded-box flex w-full basis-[30%] flex-col justify-center border border-light-strong bg-white px-6 py-4 dark:border-dark-medium dark:bg-dark-strong print:basis-[30%] print:border print:border-light-strong print:px-4 print:text-xs print:shadow-none lg:w-1/5"
         >
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
@@ -597,7 +605,7 @@ definePageMeta({
     <section class="mt-8 hidden lg:print:h-screen lg:print:w-screen">
       <!-- <img src="../assets/logo-bgremoved.png" class="mb-2 h-24" alt="" /> -->
       <div
-        class="relative flex w-full flex-col items-center rounded-[20px] bg-white py-8 px-8 text-xs shadow-lg dark:bg-dark-strong print:h-[500px] print:max-h-[500px] lg:h-[70vh] lg:text-base"
+        class="relative flex w-full flex-col items-center rounded-[20px] bg-white px-8 py-8 text-xs shadow-lg dark:bg-dark-strong print:h-[500px] print:max-h-[500px] lg:h-[70vh] lg:text-base"
       >
         <h2
           class="inset-0 top-4 h-fit text-center text-xl font-bold uppercase italic text-primary dark:text-primary/50 print:block lg:block"
@@ -666,7 +674,7 @@ definePageMeta({
     <div class="pdf flex justify-center print:hidden" v-if="!user">
       <button
         @click="generatePDF"
-        class="mt-8 flex h-14 w-40 flex-row items-center justify-center gap-2 rounded-lg border border-light-strong bg-primary px-10 py-6 text-xs text-white transition-all hover:-translate-y-[1px] hover:shadow-lg dark:border-dark-strong dark:bg-primary/50"
+        class="mt-8 flex h-14 w-40 flex-row items-center justify-center gap-2 rounded-lg border border-light-strong bg-primary px-10 py-6 text-xs text-white transition-all dark:border-dark-strong dark:bg-primary/50"
       >
         <i class="fa-solid fa-file-pdf text-lg"></i>
         Crear PDF

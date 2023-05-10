@@ -6,9 +6,7 @@ const { isLoadingFull, openAlert } = storeToRefs(store);
 <template>
   <main class="relative transition-all">
     <NuxtLayout>
-      <Transition name="slide" appear>
-        <NuxtPage />
-      </Transition>
+      <NuxtPage />
     </NuxtLayout>
 
     <ScreenLoader v-if="isLoadingFull" />

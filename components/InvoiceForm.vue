@@ -220,6 +220,7 @@ async function uploadInvoice() {
     invoiceTax: invoiceTax.value,
     invoiceTotal: invoiceTotal.value,
   });
+
 }
 
 async function onSubmit() {
@@ -256,7 +257,7 @@ function discardInvoice() {
 
 <template>
   <div
-    class="container card relative h-full border border-light-strong bg-white p-4 shadow-pinterest transition-all dark:border-dark-medium dark:bg-dark-strong lg:min-w-min lg:max-w-3xl"
+    class="container card relative h-full border border-light-strong bg-white p-4 transition-all dark:border-dark-medium dark:bg-dark-strong lg:min-w-min lg:max-w-3xl"
   >
     <form @submit.prevent="onSubmit" class="scrollbar-form relative w-full">
       <h1
@@ -307,7 +308,7 @@ function discardInvoice() {
 
             <div v-if="filteredContacts.length > 0 && contactsModal" class="w-full lg:w-1/2">
               <ul
-                class="dropdown-content menu min-h-12 flex w-full flex-col overflow-y-scroll rounded-[10px] bg-white p-2 shadow-lg dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong lg:max-h-[250px]"
+                class="dropdown-content menu min-h-12 flex w-full flex-col overflow-y-scroll rounded-[10px] border border-light-strong bg-white p-2 shadow-lg dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong lg:max-h-[250px]"
               >
                 <span class="py-2 pl-2 italic text-primary">Contactos disponibles</span>
                 <li
@@ -823,7 +824,7 @@ function discardInvoice() {
             </button>
           </section>
 
-          <section class="form-control mt-8 mb-4 flex flex-col">
+          <section class="form-control mb-4 mt-8 flex flex-col">
             <label for="notes" class="">Notas</label>
             <textarea
               id="notes"

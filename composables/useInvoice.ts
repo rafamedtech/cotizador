@@ -53,7 +53,7 @@ export const useInvoice = async (id?: string) => {
         alertMsg.value = '';
       }, 4000);
 
-      await navigateTo('/');
+      // await navigateTo('/');
     } catch (error) {
       console.error(error);
       isLoading.value = false;
@@ -66,6 +66,8 @@ export const useInvoice = async (id?: string) => {
   // - Edit currentInvoice
   async function updateInvoiceOnDb(invoice: InvoiceDraft) {
     isLoading.value = true;
+    sessionStorage.setItem(`/api/cotizacion/${invoice.invId}`, JSON.stringify(invoice));
+    sessionStorage.setItem('/api/invoices', JSON.stringify(null));
     try {
       await $fetch('/api/cotizacion/:id/update', {
         method: 'PUT',
@@ -73,6 +75,8 @@ export const useInvoice = async (id?: string) => {
           invoice,
         },
       });
+
+      await getInvoices();
 
       setTimeout(() => {
         isLoading.value = false;
@@ -97,6 +101,8 @@ export const useInvoice = async (id?: string) => {
 
   // Update invoice status
   async function updateStatusOnDb(invoice: InvoiceDraft | null | undefined) {
+    sessionStorage.setItem(`/api/cotizacion/${invoice?.invId}`, JSON.stringify(invoice));
+    sessionStorage.setItem('/api/invoices', JSON.stringify(null));
     try {
       await $fetch(`/api/cotizacion/${invoice?.id}/status`, {
         method: 'PUT',
@@ -104,6 +110,8 @@ export const useInvoice = async (id?: string) => {
           invoice,
         },
       });
+
+      await getInvoices();
 
       isLoading.value = false;
       openAlert.value = true;

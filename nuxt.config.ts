@@ -6,6 +6,7 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1.0',
     },
+    // pageTransition: { name: 'slide', mode: 'out-in' },
   },
 
   modules: [

@@ -3,7 +3,11 @@ import { Modal } from '@/types/modal';
 
 const store = useStore();
 
-const { backBtn } = storeToRefs(store);
+const { backBtn, isLoadingFull } = storeToRefs(store);
+
+onBeforeMount(() => {
+  isLoadingFull.value = false;
+});
 function discardInvoice() {
   store.$patch({
     modalType: Modal.Discard,
@@ -11,12 +15,12 @@ function discardInvoice() {
   backBtn.value?.click();
 }
 
+useHead({
+  title: 'Nueva Cotización | Suntech Cotizador',
+});
+
 definePageMeta({
   middleware: ['auth'],
-  pageTransition: {
-    name: 'slide',
-    mode: 'out-in',
-  },
 });
 </script>
 

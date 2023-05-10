@@ -1,4 +1,9 @@
 <script setup>
+import VueDatepickerUi from 'vue-datepicker-ui';
+import 'vue-datepicker-ui/lib/vuedatepickerui.css';
+
+const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+
 const store = useStore();
 const { invoiceDialog, searchQuery, filterQuery } = storeToRefs(store);
 
@@ -59,11 +64,12 @@ function clearSearch() {
   emit('@clear');
 }
 
-const searchInputs = ref(false);
+const filterDetails = ref(false);
 
 const search = ref(null);
 function toggleSearch() {
-  searchInputs.value = !searchInputs.value;
+  filterDetails.value = !filterDetails.value;
+  // search.value.focus();
 }
 </script>
 
@@ -71,26 +77,20 @@ function toggleSearch() {
   <form
     @submit.prevent="onSearch(filterQuery)"
     ref="searchBarRef"
-    class="card relative flex w-full flex-col gap-2 border border-light-strong bg-white p-4 dark:border-dark-medium dark:bg-dark-strong lg:flex-row lg:items-center"
+    class="card relative flex w-full flex-col gap-2 border border-light-strong bg-white p-4 dark:border-dark-medium dark:bg-dark-strong lg:mx-auto lg:w-2/3 lg:flex-row lg:items-center"
   >
-    <div class="dropdown-bottom dropdown-end dropdown form-control relative w-full">
-      <label class="label relative">
-        <span class="label-text text-lg text-dark-strong dark:text-light-medium"
-          >Buscar por cliente</span
-        >
-        <Icon
-          :name="
-            searchInputs
-              ? 'material-symbols:cancel-outline-rounded'
-              : 'material-symbols:search-rounded'
-          "
-          size="32"
-          class="cursor-pointer text-primary"
-          @click="toggleSearch"
-        />
+    <Icon
+      :name="filterDetails ? 'mdi:chevron-up' : 'material-symbols:display-settings-outline-rounded'"
+      size="32"
+      class="absolute top-4 right-4 cursor-pointer text-dark-medium dark:text-light-medium"
+      @click="toggleSearch"
+    />
+    <div class="flex w-full flex-col">
+      <label class="label">
+        <span class="label-text text-dark-strong dark:text-light-medium">Buscar por cliente</span>
       </label>
-      <div v-if="searchInputs">
-        <div class="relative lg:w-1/2">
+      <div class="dropdown-bottom dropdown-end dropdown form-control relative w-full">
+        <div class="relative">
           <input
             ref="search"
             v-model="searchQuery"
@@ -99,20 +99,21 @@ function toggleSearch() {
             @keydown.esc="clearSearch"
             autocomplete="off"
             type="text"
-            placeholder="Escribe aqui..."
+            placeholder="Escribe nombre del cliente..."
             class="input-primary input w-full rounded-tl-2xl bg-light-medium focus:bg-transparent dark:bg-dark-medium"
           />
           <Icon
             v-if="searchQuery"
             name="heroicons-solid:x-mark"
             class="absolute right-2 top-4 cursor-pointer text-primary"
-            @click="setContact('')"
+            @click="clearSearch"
           />
+          <!-- @click="setContact('')" -->
         </div>
 
         <div v-if="filteredContacts.length > 0 && contactsModal" class="relative w-full lg:w-1/2">
           <ul
-            class="dropdown-content menu min-h-12 top-0 mt-2 flex max-h-[250px] w-full rounded-[10px] bg-white p-2 shadow-lg dark:bg-dark-medium dark:text-light-strong"
+            class="dropdown-content menu min-h-12 top-0 mt-2 flex max-h-[250px] w-full rounded-[10px] border border-light-strong bg-white p-2 shadow-lg dark:border-dark-medium dark:bg-dark-medium dark:text-light-strong"
           >
             <span class="py-2 pl-2 italic text-primary">Clientes disponibles</span>
             <li
@@ -126,61 +127,75 @@ function toggleSearch() {
             </li>
           </ul>
         </div>
-        <div class="flex w-full flex-col lg:w-1/2">
-          <label class="label">
+      </div>
+      <div v-if="filterDetails" class="mt-2 w-full flex-col gap-x-4 lg:grid lg:grid-cols-2">
+        <div class="form-control w-full flex-col justify-center gap-2">
+          <label class="label m-0">
             <span class="label-text text-dark-strong dark:text-light-medium">Filtrar etapa</span>
           </label>
-          <div class="form-control w-full flex-col gap-2 lg:flex-row lg:items-center">
-            <select
-              v-model="filterQuery"
-              class="input select-bordered select w-full items-center rounded-xl bg-light-medium font-normal text-dark-medium dark:bg-dark-medium dark:text-light-medium lg:w-1/2"
-              @focus="contactsModal = false"
-            >
-              <!-- <option disabled selected>Filtrar etapa</option> -->
-              <option>Todas</option>
-              <option>Vendida</option>
-              <option>Pendiente</option>
-              <option>Cancelada</option>
-              <option>Borrador</option>
-              {{
-                filterQuery
-              }}
-            </select>
-            <section
-              class="mt-4 flex w-full flex-row-reverse justify-start gap-2 lg:mt-0 lg:flex-row lg:justify-between"
-            >
-              <button
-                type="submit"
-                class="btn-primary btn text-light-medium hover:border-primary/50 hover:bg-primary/50 dark:border-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                Buscar
-              </button>
-              <button
-                type="button"
-                class="btn border-light-strong bg-light-strong text-dark-medium hover:border-light-strong hover:bg-light-strong hover:text-primary dark:border-primary/50 dark:bg-primary/50 dark:hover:bg-primary dark:hover:text-light-medium lg:w-auto"
-                @click="clearSearch"
-              >
-                <Icon name="heroicons-solid:x-mark" class="text-2xl" />
-                Reset
-              </button>
-            </section>
-          </div>
+          <select
+            v-model="filterQuery"
+            class="input select-bordered select w-full items-center rounded-xl bg-light-medium font-normal text-dark-medium dark:bg-dark-medium dark:text-light-medium"
+            @focus="contactsModal = false"
+          >
+            <!-- <option disabled selected>Filtrar etapa</option> -->
+            <option>Todas</option>
+            <option>Vendida</option>
+            <option>Pendiente</option>
+            <option>Cancelada</option>
+            <option>Borrador</option>
+            {{
+              filterQuery
+            }}
+          </select>
+        </div>
+        <div class="form-control w-full flex-col justify-center gap-2">
+          <!-- <label for="paymentDueDate" class="dark:text-light-strong">Fecha</label> -->
+          <label class="label m-0">
+            <span class="label-text text-dark-strong dark:text-light-medium">Fecha</span>
+          </label>
+          <ClientOnly>
+            <VueDatepickerUi
+              lang="es"
+              placeholder="Elige fecha"
+              position="right"
+              :date-format="dateOptions"
+            />
+          </ClientOnly>
         </div>
       </div>
+      <section
+        class="mt-4 flex w-full justify-start gap-2 lg:w-1/2 lg:items-end lg:self-end lg:pl-2"
+      >
+        <button
+          type="submit"
+          class="btn-primary btn w-full text-light-medium hover:border-primary/50 hover:bg-primary/50 dark:border-primary/50 dark:bg-primary/50 dark:hover:bg-primary"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          Buscar
+        </button>
+        <!-- <button
+              type="button"
+              class="btn border-light-strong bg-light-strong text-dark-medium hover:border-light-strong hover:bg-light-strong hover:text-primary dark:border-primary/50 dark:bg-primary/50 dark:hover:bg-primary dark:hover:text-light-medium lg:w-auto"
+              @click="clearSearch"
+            >
+              <Icon name="heroicons-solid:x-mark" class="text-2xl" />
+              Reset
+            </button> -->
+      </section>
     </div>
   </form>
 </template>

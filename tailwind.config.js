@@ -22,6 +22,7 @@ module.exports = {
       },
       colors: {
         // primary: '#CD104D',
+        // primary: '#9ca3af',
         primary: '#fe6847',
         secondary: '#dfa48c',
         light: {
@@ -53,6 +54,7 @@ module.exports = {
       {
         mytheme: {
           primary: '#fe6847',
+          // primary: '#9ca3af',
           neutral: '#181818',
         },
       },
