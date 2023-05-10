@@ -19,10 +19,11 @@ const user = useSupabaseUser();
 .page-left-leave-active,
 .page-right-leave-active {
   position: fixed;
-  top: 0;
+  /* top: 0; */
   left: 0;
   right: 0;
   transition: all 0.3s linear;
+  @apply top-[40px] lg:top-0;
 }
 
 .page-left-enter-from,

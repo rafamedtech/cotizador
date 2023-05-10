@@ -106,7 +106,7 @@ async function changeStatus(status: string) {
   await updateStatusOnDb(currentInvoice.value);
 }
 
-const invoiceBtn = ref<HTMLInputElement | null>(null);
+// const invoiceBtn = ref<HTMLInputElement | null>(null);
 
 useHead({
   title: `Cotización #${id} | Suntech Cotizador`,
