@@ -5,7 +5,7 @@ import 'vue-datepicker-ui/lib/vuedatepickerui.css';
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
 const store = useStore();
-const { invoiceDialog, searchQuery, filterQuery } = storeToRefs(store);
+const { invoiceDialog, searchQuery, filterQuery, searchDate } = storeToRefs(store);
 
 const emit = defineEmits(['@search', '@clear']);
 
@@ -55,11 +55,12 @@ watch(searchQuery, () => {
 
 function clearSearch() {
   contactsModal.value = false;
-  if (searchQuery.value === '' && filterQuery.value === 'Todas') {
+  if (searchQuery.value === '' && filterQuery.value === 'Todas' && !searchDate.value) {
     return;
   }
   searchQuery.value = '';
   filterQuery.value = 'Todas';
+  searchDate.value = null;
   emit('@search', searchQuery.value);
   emit('@clear');
 }
@@ -82,7 +83,7 @@ function toggleSearch() {
     <Icon
       :name="filterDetails ? 'mdi:chevron-up' : 'material-symbols:display-settings-outline-rounded'"
       size="32"
-      class="absolute top-4 right-4 cursor-pointer text-dark-medium dark:text-light-medium"
+      class="absolute right-4 top-4 cursor-pointer text-dark-medium dark:text-light-medium"
       @click="toggleSearch"
     />
     <div class="flex w-full flex-col">
@@ -103,7 +104,7 @@ function toggleSearch() {
             class="input-primary input w-full rounded-tl-2xl bg-light-medium focus:bg-transparent dark:bg-dark-medium"
           />
           <Icon
-            v-if="searchQuery"
+            v-if="searchQuery || searchDate"
             name="heroicons-solid:x-mark"
             class="absolute right-2 top-4 cursor-pointer text-primary"
             @click="clearSearch"
@@ -111,7 +112,7 @@ function toggleSearch() {
           <!-- @click="setContact('')" -->
         </div>
 
-        <div v-if="filteredContacts.length > 0 && contactsModal" class="relative w-full lg:w-1/2">
+        <div v-if="filteredContacts.length > 0 && contactsModal" class="relative w-full">
           <ul
             class="dropdown-content menu min-h-12 top-0 mt-2 flex max-h-[250px] w-full rounded-[10px] border border-light-strong bg-white p-2 shadow-lg dark:border-dark-medium dark:bg-dark-medium dark:text-light-strong"
           >
@@ -128,42 +129,47 @@ function toggleSearch() {
           </ul>
         </div>
       </div>
-      <div v-if="filterDetails" class="mt-2 w-full flex-col gap-x-4 lg:grid lg:grid-cols-2">
-        <div class="form-control w-full flex-col justify-center gap-2">
-          <label class="label m-0">
-            <span class="label-text text-dark-strong dark:text-light-medium">Filtrar etapa</span>
-          </label>
-          <select
-            v-model="filterQuery"
-            class="input select-bordered select w-full items-center rounded-xl bg-light-medium font-normal text-dark-medium dark:bg-dark-medium dark:text-light-medium"
-            @focus="contactsModal = false"
-          >
-            <!-- <option disabled selected>Filtrar etapa</option> -->
-            <option>Todas</option>
-            <option>Vendida</option>
-            <option>Pendiente</option>
-            <option>Cancelada</option>
-            <option>Borrador</option>
-            {{
-              filterQuery
-            }}
-          </select>
+      <!-- Search Details -->
+      <Transition name="slide">
+        <div v-if="filterDetails" class="mt-2 w-full flex-col gap-x-4 lg:grid lg:grid-cols-2">
+          <div class="form-control mb-2 w-full flex-col justify-center gap-1 lg:mb-0">
+            <label class="label m-0">
+              <span class="label-text text-dark-strong dark:text-light-medium">Filtrar etapa</span>
+            </label>
+            <select
+              v-model="filterQuery"
+              class="input select-bordered select w-full items-center rounded-xl bg-light-medium font-normal text-dark-medium dark:bg-dark-medium dark:text-light-medium"
+              @focus="contactsModal = false"
+            >
+              <!-- <option disabled selected>Filtrar etapa</option> -->
+              <option>Todas</option>
+              <option>Vendida</option>
+              <option>Pendiente</option>
+              <option>Cancelada</option>
+              <option>Borrador</option>
+              {{
+                filterQuery
+              }}
+            </select>
+          </div>
+          <div class="form-control w-full flex-col justify-center gap-1">
+            <!-- <label for="paymentDueDate" class="dark:text-light-strong">Fecha</label> -->
+            <label class="label m-0">
+              <span class="label-text text-dark-strong dark:text-light-medium">Fecha</span>
+            </label>
+            <ClientOnly>
+              <VueDatepickerUi
+                v-model="searchDate"
+                lang="es"
+                placeholder="Elige fecha"
+                position="right"
+                :date-format="dateOptions"
+              />
+            </ClientOnly>
+          </div>
         </div>
-        <div class="form-control w-full flex-col justify-center gap-2">
-          <!-- <label for="paymentDueDate" class="dark:text-light-strong">Fecha</label> -->
-          <label class="label m-0">
-            <span class="label-text text-dark-strong dark:text-light-medium">Fecha</span>
-          </label>
-          <ClientOnly>
-            <VueDatepickerUi
-              lang="es"
-              placeholder="Elige fecha"
-              position="right"
-              :date-format="dateOptions"
-            />
-          </ClientOnly>
-        </div>
-      </div>
+      </Transition>
+      <!--  -->
       <section
         class="mt-4 flex w-full justify-start gap-2 lg:w-1/2 lg:items-end lg:self-end lg:pl-2"
       >

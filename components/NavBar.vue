@@ -28,8 +28,14 @@ const userLogout = () => {
     class="z-[99] flex w-full justify-between bg-dark-medium shadow-sm dark:bg-dark-strong print:hidden md:fixed md:max-h-screen md:min-h-full md:w-32 md:min-w-[80px] md:flex-col md:shadow-lg"
   >
     <section class="flex w-full items-center justify-between px-2 md:block lg:w-auto">
-      <div class="flex h-16 w-fit items-center justify-center rounded-[10px] p-4 pt-6 lg:w-full">
-        <img src="@/assets/images/Suntech-logo-cropped.png" alt="" class="h-full w-auto" />
+      <div
+        class="flex h-16 w-fit items-center justify-center rounded-[10px] p-4 lg:w-full lg:pt-10"
+      >
+        <img
+          src="@/assets/images/Suntech-logo-cropped.png"
+          alt=""
+          class="h-full w-auto lg:h-auto lg:w-full"
+        />
       </div>
       <button
         type="button"

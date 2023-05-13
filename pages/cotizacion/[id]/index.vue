@@ -135,7 +135,7 @@ useHead({
   >
     <div v-if="currentInvoice && user" class="invoice-view my-container mb-4 print:hidden">
       <NuxtLink
-        class="nav-link absolute -top-2 flex gap-2 md:relative lg:absolute lg:top-2"
+        class="nav-link absolute top-2 flex gap-2 md:relative lg:absolute lg:top-2"
         :to="{ name: 'cotizaciones' }"
       >
         <Icon class="text-2xl text-primary" name="heroicons-solid:arrow-left" />
@@ -266,7 +266,7 @@ useHead({
         <section class="relative flex h-full justify-between px-4 lg:px-8">
           <div class="mb-4 h-full w-1/2">
             <img
-              class="my-4 mb-2 h-12 bg-dark-medium dark:bg-transparent"
+              class="mb-2 h-12 bg-dark-medium dark:bg-transparent lg:my-4"
               src="@/assets/images/Suntech-logo-cropped.png"
             />
             <span class="block text-xs font-bold text-primary dark:text-primary/50"

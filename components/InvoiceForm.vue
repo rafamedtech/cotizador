@@ -220,7 +220,6 @@ async function uploadInvoice() {
     invoiceTax: invoiceTax.value,
     invoiceTotal: invoiceTotal.value,
   });
-
 }
 
 async function onSubmit() {
@@ -324,7 +323,9 @@ function discardInvoice() {
             </div>
           </div>
 
-          <div class="dropdown-bottom dropdown form-control relative mb-4 h-full w-1/2 items-end">
+          <div
+            class="dropdown-bottom dropdown form-control relative mb-4 h-full w-1/2 items-end text-xs"
+          >
             <label class="label w-full text-left">
               <span class="label-text text-dark-strong dark:text-light-medium">Etapa</span>
             </label>
@@ -333,8 +334,9 @@ function discardInvoice() {
             <div class="w-full">
               <ul
                 v-if="statusModal"
-                class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-[10px] bg-white p-2 shadow-lg transition-all dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong"
+                class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-lg border border-light-strong bg-white shadow-lg transition-all dark:border dark:border-dark-strong dark:bg-dark-strong dark:text-light-strong"
               >
+                <!-- class="dropdown-content menu min-h-12 mt-2 flex max-h-[250px] w-fit rounded-[10px] bg-white p-2 shadow-lg transition-all dark:border dark:border-dark-medium dark:bg-dark-strong dark:text-light-strong" -->
                 <!-- <span class="py-2 pl-2 italic text-primary">Contactos disponibles</span> -->
                 <li
                   class="cursor-pointer text-dark-medium dark:text-light-medium dark:hover:text-primary"

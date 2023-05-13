@@ -31,7 +31,7 @@ const { isLoadingFull, openAlert } = storeToRefs(store);
 
 .custom-container {
   width: 100%;
-  padding: 40px 10px 8rem 10px;
+  padding: 80px 10px 8rem 10px;
   max-width: 850px;
   margin: 0 auto;
 

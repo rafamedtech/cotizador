@@ -23,12 +23,14 @@ export const useStore = defineStore('main', () => {
   const filteredInvoices = reactive<InvoiceOutline[]>([]);
   const searchQuery = ref('');
   const filterQuery = ref('Todas');
+  const searchDate = ref(null);
 
   const backBtn = ref<HTMLElement | null>(null);
 
   return {
     searchQuery,
     filterQuery,
+    searchDate,
     filterResults,
     filteredInvoices,
     openAlert,

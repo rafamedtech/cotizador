@@ -135,7 +135,7 @@ definePageMeta({
       </div>
     </div>
     <section class="mt-8 flex flex-col gap-4">
-      <h2 class="text-center text-2xl text-dark-medium dark:text-light-medium">Ultimos clientes</h2>
+      <h2 class="text-center text-2xl text-dark-medium dark:text-light-medium">Últimos clientes</h2>
       <!-- <Bar :data="chartData" /> -->
       <div
         v-if="uniqueContacts.length"
@@ -165,7 +165,7 @@ definePageMeta({
         </div>
       </div>
       <div
-        class="stats min-h-16 stats-vertical grid w-full max-w-2xl place-items-center text-primary shadow dark:bg-dark-strong dark:text-primary/50"
+        class="stats min-h-16 stats-vertical grid w-full min-w-full max-w-2xl place-items-center border border-light-strong text-primary dark:border-dark-medium dark:bg-dark-strong dark:text-primary/50"
         v-else
       >
         No hay clientes

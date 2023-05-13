@@ -6,8 +6,15 @@ import gsap from 'gsap';
 // import 'vue-datepicker-ui/lib/vuedatepickerui.css';
 
 const store = useStore();
-const { isLoading, isLoadingFull, invoicesLoaded, searchQuery, filterQuery, filterResults } =
-  storeToRefs(store);
+const {
+  isLoading,
+  isLoadingFull,
+  invoicesLoaded,
+  searchQuery,
+  filterQuery,
+  filterResults,
+  searchDate,
+} = storeToRefs(store);
 
 // const { invoices } = await useInvoices();
 const invoices = ref([]);
@@ -33,6 +40,12 @@ onMounted(async () => {
   }
 });
 
+// watchEffect(() => {
+//   console.log(new Date(searchDate.value).toLocaleString('es-MX', dateOptions));
+// });
+
+// const dateSearch = computed(() => new Date(searchDate.value).toLocaleString('es-MX', dateOptions));
+
 const searchSubmit = ref(false);
 const filterStatus = ref('Todas');
 function searchInvoices() {
@@ -46,23 +59,57 @@ function searchInvoices() {
     invoicesLoaded.value = true;
   }, 1000);
 
-  if (filterQuery.value === 'Todas') {
+  if (filterQuery.value === 'Todas' && !searchDate.value) {
     filteredInvoices.value = invoices.value.filter((invoice) => {
       return invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase());
     });
-  } else {
+  } else if (filterQuery.value === 'Todas') {
+    filteredInvoices.value = invoices.value.filter((invoice) => {
+      return (
+        invoice.invoiceDate === new Date(searchDate.value).toLocaleString('es-MX', dateOptions) &&
+        invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase())
+      );
+    });
+  } else if (!searchDate.value) {
     filteredInvoices.value = invoices.value.filter((invoice) => {
       return (
         invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
         invoice.status === filterQuery.value
       );
     });
+  } else {
+    filteredInvoices.value = invoices.value.filter((invoice) => {
+      return (
+        invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
+        invoice.status === filterQuery.value &&
+        invoice.invoiceDate === new Date(searchDate.value).toLocaleString('es-MX', dateOptions)
+      );
+    });
   }
+  // if (filterQuery.value === 'Todas' && !searchDate.value) {
+  //   filteredInvoices.value = invoices.value.filter((invoice) => {
+  //     return invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase());
+  //   });
+  // } else {
+  //   filteredInvoices.value = invoices.value.filter((invoice) => {
+  //     return (
+  //       invoice.clientCompany.toLowerCase().includes(searchQuery.value.toLowerCase()) &&
+  //       invoice.status === filterQuery.value
+  //     );
+  //   });
+  // }
+
+  // invoices.value.forEach((invoice) =>
+  //   console.log(
+  //     new Date(invoice.invoiceDate).toLocaleString('es-MX', dateOptions) ===
+  //       new Date(searchDate.value).toLocaleString('es-MX', dateOptions)
+  //   )
+  // );
 
   if (filteredInvoices.value.length === 0) {
-    filterResults.value = false;
+    return (filterResults.value = false);
   } else {
-    filterResults.value = true;
+    return (filterResults.value = true);
   }
 }
 
@@ -100,7 +147,7 @@ function toggleFilter() {
   toggleMenu.value = true;
 }
 
-// const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
 useHead({
   title: 'Cotizaciones | Suntech Cotizador',
@@ -112,7 +159,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="custom-container">
+  <div class="custom-container" :style="{ 'padding-top': '40px' }">
     <div>
       <transition appear @before-enter="beforeEnter" @enter="enter">
         <div class="mb-8 flex justify-between">
